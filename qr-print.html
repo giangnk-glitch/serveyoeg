@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cyber Hub — QR Codes</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root {
+    --green: #00C48C; --dark: #0A1520; --card: #111D2C; --border: rgba(255,255,255,.08);
+    --text: #D8E4EF; --muted: #5A7080;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--dark); color: var(--text); font-family: 'Be Vietnam Pro', sans-serif; padding: 28px 24px 60px; }
+
+  .page-header { max-width: 900px; margin: 0 auto 32px; }
+  .page-title { font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+  .page-sub { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+
+  .config-bar {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 16px 20px;
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  }
+  .config-bar label { font-size: 12px; color: var(--muted); }
+  .config-bar input {
+    flex: 1; min-width: 200px; padding: 8px 12px;
+    background: rgba(255,255,255,.04); border: 1px solid var(--border);
+    border-radius: 8px; color: var(--text);
+    font-family: 'Be Vietnam Pro', sans-serif; font-size: 13px; outline: none;
+    transition: border-color .15s;
+  }
+  .config-bar input:focus { border-color: var(--green); }
+  .btn-gen {
+    padding: 9px 18px; background: var(--green); border: none;
+    border-radius: 8px; color: #fff; font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap;
+    transition: opacity .15s;
+  }
+  .btn-gen:hover { opacity: .85; }
+  .btn-print {
+    padding: 9px 18px; background: transparent;
+    border: 1px solid var(--border); border-radius: 8px;
+    color: var(--muted); font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 13px; cursor: pointer; white-space: nowrap;
+    transition: all .15s;
+  }
+  .btn-print:hover { border-color: var(--green); color: var(--green); }
+
+  .qr-grid {
+    max-width: 900px; margin: 0 auto;
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .qr-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 24px 20px;
+    display: flex; flex-direction: column; align-items: center; gap: 16px;
+    transition: border-color .2s;
+  }
+  .qr-card:hover { border-color: rgba(0,196,140,.3); }
+  .branch-badge {
+    width: 100%; display: flex; align-items: center; gap: 10px;
+  }
+  .branch-color-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .branch-name { font-size: 15px; font-weight: 600; color: #fff; }
+  .branch-id { font-size: 11px; color: var(--muted); }
+  .qr-wrap {
+    background: #fff; border-radius: 12px;
+    padding: 14px; width: 160px; height: 160px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .qr-url {
+    font-size: 10px; color: var(--muted);
+    word-break: break-all; text-align: center;
+    line-height: 1.5; max-width: 180px;
+  }
+  .btn-dl {
+    width: 100%; padding: 9px;
+    background: rgba(0,196,140,.08);
+    border: 1px solid rgba(0,196,140,.2);
+    border-radius: 8px; color: var(--green);
+    font-family: 'Be Vietnam Pro', sans-serif; font-size: 12px;
+    cursor: pointer; transition: all .15s;
+  }
+  .btn-dl:hover { background: rgba(0,196,140,.15); }
+
+  .steps {
+    max-width: 900px; margin: 32px auto 0;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 22px 24px;
+  }
+  .steps-title { font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 16px; }
+  .step-row { display: flex; gap: 12px; margin-bottom: 12px; align-items: flex-start; }
+  .step-num {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--green); color: #fff;
+    font-size: 11px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 1px;
+  }
+  .step-text { font-size: 13px; line-height: 1.6; }
+  .step-text strong { color: var(--green); }
+  .step-text code {
+    background: rgba(255,255,255,.07); padding: 1px 6px;
+    border-radius: 4px; font-family: monospace; font-size: 12px;
+    color: var(--amber);
+  }
+
+  @media print {
+    body { background: #fff; color: #000; padding: 0; }
+    .config-bar, .steps, .btn-print, .btn-dl { display: none !important; }
+    .page-header { margin-bottom: 20px; }
+    .page-title, .branch-name { color: #000; }
+    .qr-card { border: 1px solid #ddd; break-inside: avoid; }
+    .branch-id, .qr-url { color: #666; }
+    .qr-grid { gap: 12px; }
+  }
+  @media (max-width: 700px) {
+    .qr-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 460px) {
+    .qr-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="page-title">QR Codes — Cyber Hub Survey</div>
+  <div class="page-sub">Tạo và in mã QR cho 6 cơ sở. Khách quét → điền khảo sát → tự động ghi vào Google Sheets.</div>
+  <div class="config-bar">
+    <label>URL khảo sát (GitHub Pages):</label>
+    <input type="text" id="base-url" placeholder="https://username.github.io/cyberhub-survey/survey.html" />
+    <button class="btn-gen" onclick="generateAll()">Tạo QR</button>
+    <button class="btn-print" onclick="window.print()">🖨️ In tất cả</button>
+  </div>
+</div>
+
+<div class="qr-grid" id="qr-grid"></div>
+
+<div class="steps">
+  <div class="steps-title">Hướng dẫn deploy lên GitHub Pages</div>
+  <div class="step-row">
+    <div class="step-num">1</div>
+    <div class="step-text">Tạo repository GitHub tên <strong>cyberhub-survey</strong> (public), upload 3 file: <code>survey.html</code>, <code>dashboard.html</code>, <code>qr-print.html</code></div>
+  </div>
+  <div class="step-row">
+    <div class="step-num">2</div>
+    <div class="step-text">Vào <strong>Settings → Pages</strong>, chọn source = <code>main branch / root</code>. GitHub tự cấp URL dạng <code>https://username.github.io/cyberhub-survey/</code></div>
+  </div>
+  <div class="step-row">
+    <div class="step-num">3</div>
+    <div class="step-text">Vào <strong>script.google.com</strong>, tạo project mới, paste nội dung file <code>Code.gs</code>, thay <code>SHEET_ID</code> bằng ID Google Sheet của anh</div>
+  </div>
+  <div class="step-row">
+    <div class="step-num">4</div>
+    <div class="step-text">Deploy Apps Script: <strong>Deploy → New deployment → Web App</strong>. Copy URL → paste vào <code>SCRIPT_URL</code> trong cả <code>survey.html</code> và <code>dashboard.html</code></div>
+  </div>
+  <div class="step-row">
+    <div class="step-num">5</div>
+    <div class="step-text">Quay lại trang này, nhập URL GitHub Pages của anh → bấm <strong>Tạo QR</strong> → in và dán tại các cơ sở</div>
+  </div>
+</div>
+
+<script>
+const BRANCHES = [
+  { id: 'stadium',      name: 'Stadium',       color: '#00C48C', icon: '🏟️' },
+  { id: 'tay_son',      name: 'Tây Sơn',       color: '#4B9EFF', icon: '🎮' },
+  { id: 'll_quan',      name: 'LL Quân',        color: '#FFB020', icon: '⚡' },
+  { id: 'tran_vy',      name: 'Trần Vỹ',       color: '#FF7B5B', icon: '🖥️' },
+  { id: 'tq_hoan',      name: 'TQ Hoàn',       color: '#B06EFF', icon: '🎯' },
+  { id: 'chien_thang',  name: 'Chiến Thắng',   color: '#FF5B9A', icon: '🏆' },
+];
+
+function generateAll() {
+  const baseUrl = document.getElementById('base-url').value.trim() || 'https://your-site.github.io/cyberhub-survey/survey.html';
+  const grid = document.getElementById('qr-grid');
+  grid.innerHTML = '';
+
+  BRANCHES.forEach(b => {
+    // Note: branch is pre-selected via URL param for UX hint; user still selects in form
+    const url = baseUrl + '?ref=' + b.id;
+
+    const card = document.createElement('div');
+    card.className = 'qr-card';
+    card.innerHTML = `
+      <div class="branch-badge">
+        <div class="branch-color-dot" style="background:${b.color}"></div>
+        <div>
+          <div class="branch-name">${b.icon} ${b.name}</div>
+          <div class="branch-id">cyberhub-${b.id}</div>
+        </div>
+      </div>
+      <div class="qr-wrap" id="qr-${b.id}"></div>
+      <div class="qr-url">${url}</div>
+      <button class="btn-dl" onclick="downloadQR('${b.id}','${b.name}')">↓ Tải ảnh PNG</button>
+    `;
+    grid.appendChild(card);
+
+    setTimeout(() => {
+      new QRCode(document.getElementById('qr-' + b.id), {
+        text: url,
+        width: 132, height: 132,
+        colorDark: '#000000', colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.H
+      });
+    }, 50);
+  });
+}
+
+function downloadQR(id, name) {
+  const wrap = document.getElementById('qr-' + id);
+  const canvas = wrap.querySelector('canvas');
+  if (!canvas) { alert('Vui lòng bấm "Tạo QR" trước.'); return; }
+  const link = document.createElement('a');
+  link.download = 'QR_CyberHub_' + name + '.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+// Auto-generate with placeholder on load
+window.onload = () => generateAll();
+</script>
+</body>
+</html>
