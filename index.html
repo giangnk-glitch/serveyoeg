@@ -266,152 +266,31 @@ const USERS={
 const BRANCHES=['Stadium','Tây Sơn','LL Quân','Trần Vỹ','TQ Hoàn','Chiến Thắng'];
 const BCOLORS=['#1D9E75','#378ADD','#BA7517','#D85A30','#7F77DD','#D4537E'];
 
-
-<!-- ═══════════════════════════════════════════════════════════
-     API CONFIG — chỉnh 2 dòng này sau khi deploy Web App
-     ═══════════════════════════════════════════════════════════ -->
-<script>
-const FNB_API_URL = "PASTE_WEB_APP_URL_HERE";
-const FNB_TOKEN   = "oeg-fnb-key-2026";
-
-// Khi API chưa cấu hình (URL chưa thay), dùng mock để dashboard
-// vẫn chạy được. Sau khi paste URL thật vào trên → tắt flag này.
-const USE_MOCK = FNB_API_URL === "PASTE_WEB_APP_URL_HERE";
-
-// ─────────────────────────────────────────────
-// MOCK DATA (giữ nguyên để fallback)
-// ─────────────────────────────────────────────
-const _RAW={
-  'Stadium':    {revenue:5200000,orders:98, qty:156,costNvl:1560000,topItems:[{name:'Cà phê sữa đá',qty:42,revenue:1470000},{name:'Bạc xỉu đá',qty:38,revenue:1330000},{name:'Trà đào cam sả',qty:31,revenue:1395000},{name:'Matcha latte',qty:22,revenue:1210000},{name:'Nước ép cam',qty:23,revenue:805000}],stock:[{nvlName:'Cà phê Arabica',status:'Đủ'},{nvlName:'Sữa tươi',status:'Đủ'},{nvlName:'Đường trắng',status:'Sắp hết'}]},
-  'Tây Sơn':   {revenue:4200000,orders:82, qty:127,costNvl:1344000,topItems:[{name:'Bạc xỉu đá',qty:28,revenue:980000},{name:'Trà đào cam sả',qty:21,revenue:945000},{name:'Cà phê sữa đá',qty:18,revenue:630000},{name:'Matcha latte',qty:9,revenue:495000},{name:'Nước ép cam',qty:8,revenue:280000}],stock:[{nvlName:'Đường trắng',status:'Hết hàng'},{nvlName:'Trân châu',status:'Hết hàng'},{nvlName:'Sữa tươi',status:'Đủ'}]},
-  'LL Quân':   {revenue:3800000,orders:74, qty:112,costNvl:1140000,topItems:[{name:'Trà đào cam sả',qty:30,revenue:1350000},{name:'Cà phê sữa đá',qty:24,revenue:840000},{name:'Bạc xỉu đá',qty:22,revenue:770000},{name:'Matcha latte',qty:14,revenue:770000},{name:'Nước ép cam',qty:11,revenue:385000}],stock:[{nvlName:'Syrup caramel',status:'Sắp hết'},{nvlName:'Sữa tươi',status:'Đủ'},{nvlName:'Đường trắng',status:'Đủ'}]},
-  'Trần Vỹ':   {revenue:3100000,orders:59, qty:88, costNvl:930000, topItems:[{name:'Cà phê sữa đá',qty:22,revenue:770000},{name:'Bạc xỉu đá',qty:18,revenue:630000},{name:'Trà đào cam sả',qty:15,revenue:675000},{name:'Nước ép cam',qty:10,revenue:350000},{name:'Matcha latte',qty:8,revenue:440000}],stock:[{nvlName:'Cà phê Arabica',status:'Sắp hết'},{nvlName:'Trân châu',status:'Đủ'},{nvlName:'Sữa tươi',status:'Đủ'}]},
-  'TQ Hoàn':   {revenue:2900000,orders:55, qty:82, costNvl:870000, topItems:[{name:'Bạc xỉu đá',qty:20,revenue:700000},{name:'Trà đào cam sả',qty:16,revenue:720000},{name:'Cà phê sữa đá',qty:14,revenue:490000},{name:'Nước ép cam',qty:9,revenue:315000},{name:'Matcha latte',qty:7,revenue:385000}],stock:[{nvlName:'Matcha bột',status:'Hết hàng'},{nvlName:'Đường trắng',status:'Đủ'},{nvlName:'Sữa tươi',status:'Đủ'}]},
-  'Chiến Thắng':{revenue:2400000,orders:47,qty:71, costNvl:720000, topItems:[{name:'Cà phê sữa đá',qty:19,revenue:665000},{name:'Trà đào cam sả',qty:15,revenue:675000},{name:'Bạc xỉu đá',qty:12,revenue:420000},{name:'Nước ép cam',qty:9,revenue:315000},{name:'Matcha latte',qty:6,revenue:330000}],stock:[{nvlName:'Cà phê Arabica',status:'Đủ'},{nvlName:'Sữa tươi',status:'Sắp hết'},{nvlName:'Đường trắng',status:'Đủ'}]},
+const RAW={
+  'Stadium':    {rev:5200000,orders:98, qty:156,cost:1560000,items:[{n:'Cà phê sữa đá',q:42,r:1470000},{n:'Bạc xỉu đá',q:38,r:1330000},{n:'Trà đào cam sả',q:31,r:1395000},{n:'Matcha latte',q:22,r:1210000},{n:'Nước ép cam',q:23,r:805000}],stock:[{n:'Cà phê Arabica',s:'ok'},{n:'Sữa tươi',s:'ok'},{n:'Đường trắng',s:'warn'}]},
+  'Tây Sơn':   {rev:4200000,orders:82, qty:127,cost:1344000,items:[{n:'Bạc xỉu đá',q:28,r:980000},{n:'Trà đào cam sả',q:21,r:945000},{n:'Cà phê sữa đá',q:18,r:630000},{n:'Matcha latte',q:9, r:495000},{n:'Nước ép cam',q:8, r:280000}],stock:[{n:'Đường trắng',s:'danger'},{n:'Trân châu',s:'danger'},{n:'Sữa tươi',s:'ok'}]},
+  'LL Quân':   {rev:3800000,orders:74, qty:112,cost:1140000,items:[{n:'Trà đào cam sả',q:30,r:1350000},{n:'Cà phê sữa đá',q:24,r:840000},{n:'Bạc xỉu đá',q:22,r:770000},{n:'Matcha latte',q:14,r:770000},{n:'Nước ép cam',q:11,r:385000}],stock:[{n:'Syrup caramel',s:'warn'},{n:'Sữa tươi',s:'ok'},{n:'Đường trắng',s:'ok'}]},
+  'Trần Vỹ':   {rev:3100000,orders:59, qty:88, cost:930000, items:[{n:'Cà phê sữa đá',q:22,r:770000},{n:'Bạc xỉu đá',q:18,r:630000},{n:'Trà đào cam sả',q:15,r:675000},{n:'Nước ép cam',q:10,r:350000},{n:'Matcha latte',q:8, r:440000}],stock:[{n:'Cà phê Arabica',s:'warn'},{n:'Trân châu',s:'ok'},{n:'Sữa tươi',s:'ok'}]},
+  'TQ Hoàn':   {rev:2900000,orders:55, qty:82, cost:870000, items:[{n:'Bạc xỉu đá',q:20,r:700000},{n:'Trà đào cam sả',q:16,r:720000},{n:'Cà phê sữa đá',q:14,r:490000},{n:'Nước ép cam',q:9, r:315000},{n:'Matcha latte',q:7, r:385000}],stock:[{n:'Matcha bột',s:'danger'},{n:'Đường trắng',s:'ok'},{n:'Sữa tươi',s:'ok'}]},
+  'Chiến Thắng':{rev:2400000,orders:47,qty:71, cost:720000, items:[{n:'Cà phê sữa đá',q:19,r:665000},{n:'Trà đào cam sả',q:15,r:675000},{n:'Bạc xỉu đá',q:12,r:420000},{n:'Nước ép cam',q:9, r:315000},{n:'Matcha latte',q:6, r:330000}],stock:[{n:'Cà phê Arabica',s:'ok'},{n:'Sữa tươi',s:'warn'},{n:'Đường trắng',s:'ok'}]},
 };
-function _mockScale(f){
-  const o={totals:{revenue:0,orders:0,qty:0,costNvl:0,grossProfit:0},branches:[]};
+
+function scale(f){
+  const o={};
   BRANCHES.forEach(b=>{
-    const d=_RAW[b];
-    const rev=Math.round(d.revenue*f),cost=Math.round(d.costNvl*f);
-    const br={branch:b,revenue:rev,orders:Math.round(d.orders*f),qty:Math.round(d.qty*f),
-      costNvl:cost,grossProfit:rev-cost,
-      costPct:rev>0?Math.round(cost/rev*1000)/10:0,
-      marginPct:rev>0?Math.round((rev-cost)/rev*1000)/10:0,
-      topItems:d.topItems.map(i=>({name:i.name,qty:Math.round(i.qty*f),revenue:Math.round(i.revenue*f)})),
-      stock:d.stock,
-      hourly:['8h','9h','10h','11h','12h','13h','14h','15h','16h','17h','18h','19h','20h'].map((h,i)=>({hour:h,revenue:Math.max(0,Math.round(rev/13*(0.5+Math.sin(i*0.8+b.length)*0.35)))}))
-    };
-    o.branches.push(br);
-    o.totals.revenue+=rev;o.totals.orders+=br.orders;o.totals.qty+=br.qty;
-    o.totals.costNvl+=cost;o.totals.grossProfit+=br.grossProfit;
-  });
-  o.branches.sort((a,b)=>b.revenue-a.revenue);
-  o.totals.costPct=o.totals.revenue>0?Math.round(o.totals.costNvl/o.totals.revenue*1000)/10:0;
-  o.totals.marginPct=o.totals.revenue>0?Math.round(o.totals.grossProfit/o.totals.revenue*1000)/10:0;
-  return o;
+    const d=RAW[b];
+    o[b]={rev:Math.round(d.rev*f),orders:Math.round(d.orders*f),qty:Math.round(d.qty*f),cost:Math.round(d.cost*f),
+      items:d.items.map(i=>({n:i.n,q:Math.round(i.q*f),r:Math.round(i.r*f)})),stock:d.stock};
+  });return o;
 }
-const _MOCK={day:_mockScale(1),week:_mockScale(7),month:_mockScale(30)};
-
-// ─────────────────────────────────────────────
-// API LAYER — mock hoặc live
-// ─────────────────────────────────────────────
-const _cache = {};
-
-async function _apiFetch(action, params={}) {
-  const key = JSON.stringify({action, params});
-  const now = Date.now();
-  if (_cache[key] && now - _cache[key].ts < 5*60*1000) return _cache[key].data; // cache 5 phút
-
-  if (USE_MOCK) {
-    const p = params.period || 'day';
-    if (action==='chain') return _MOCK[p];
-    if (action==='branch') {
-      const found = _MOCK[p].branches.find(b=>b.branch===params.branch);
-      return found || {};
-    }
-    return {};
-  }
-
-  const qs = new URLSearchParams({action, token: FNB_TOKEN, ...params});
-  const res = await fetch(`${FNB_API_URL}?${qs}`, {redirect:'follow', cache:'no-store'});
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  const json = await res.json();
-  if (!json.ok) throw new Error(json.error||'API error');
-  _cache[key] = {data: json.data, ts: now};
-  return json.data;
-}
-
-async function getChainData(p)  { return _apiFetch('chain',  {period:p}); }
-async function getBranchData(b, p) {
-  const chain = await getChainData(p);
-  const found = (chain.branches||[]).find(br=>br.branch===b) || {};
-  // Khi live: stock và hourly cần call riêng vì refreshFnbData() không lưu chúng vào FNB_DATA
-  if (!USE_MOCK) {
-    try { const s = await _apiFetch('stock', {branch:b}); found.stock = s.items||[]; } catch(e){}
-    try { const h = await _apiFetch('hourly',{branch:b});  found.hourly= h.hours||[]; } catch(e){}
-    try { const t = await _apiFetch('topitems',{period:p,branch:b}); found.topItems=t.items||[]; } catch(e){}
-  }
-  return found;
-}
-
-// ─────────────────────────────────────────────
-// LOADING / ERROR HELPERS
-// ─────────────────────────────────────────────
-function _loading(id) {
-  const el=document.getElementById(id); if(!el)return;
-  el.innerHTML=`<div style="display:flex;align-items:center;gap:8px;padding:16px;color:var(--muted);font-size:13px">
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
-    Đang tải...</div>`;
-}
-function _error(id, msg) {
-  const el=document.getElementById(id); if(!el)return;
-  el.innerHTML=`<div style="padding:12px;background:var(--danger-bg);border-radius:8px;color:var(--danger-text);font-size:12px">Lỗi: ${msg}</div>`;
-}
-const _spin = document.createElement('style');
-_spin.textContent='@keyframes spin{to{transform:rotate(360deg)}}';
-document.head.appendChild(_spin);
-
-// ─────────────────────────────────────────────
-// STATUS BADGE: "● Live data" vs "● Mock data"
-// ─────────────────────────────────────────────
-function _injectStatusBadge() {
-  const bar = document.querySelector('.topbar .tb-right');
-  if (!bar) return;
-  const badge = document.createElement('div');
-  badge.id = 'data-status';
-  badge.style.cssText='display:flex;align-items:center;gap:4px;font-size:11px;padding:4px 8px;border-radius:20px;border:1px solid var(--border);color:var(--muted)';
-  badge.innerHTML = USE_MOCK
-    ? '<span style="width:7px;height:7px;border-radius:50%;background:#BA7517;display:inline-block"></span>Demo data'
-    : '<span style="width:7px;height:7px;border-radius:50%;background:#1D9E75;display:inline-block"></span>Live data';
-  bar.insertBefore(badge, bar.firstChild);
-}
-
-// ─────────────────────────────────────────────
-// USERS & APP STATE
-// ─────────────────────────────────────────────
-const USERS={
-  'rm.andrew':    {pass:'oeg2024',role:'rm', name:'Andrew (RM)',    branch:null},
-  'cht.tayson':   {pass:'oeg2024',role:'cht',name:'CHT Tây Sơn',    branch:'Tây Sơn'},
-  'cht.stadium':  {pass:'oeg2024',role:'cht',name:'CHT Stadium',    branch:'Stadium'},
-  'cht.llquan':   {pass:'oeg2024',role:'cht',name:'CHT LL Quân',    branch:'LL Quân'},
-  'cht.tranvy':   {pass:'oeg2024',role:'cht',name:'CHT Trần Vỹ',    branch:'Trần Vỹ'},
-  'cht.tqhoan':   {pass:'oeg2024',role:'cht',name:'CHT TQ Hoàn',    branch:'TQ Hoàn'},
-  'cht.chienthang':{pass:'oeg2024',role:'cht',name:'CHT Chiến Thắng',branch:'Chiến Thắng'},
-};
-const BRANCHES=['Stadium','Tây Sơn','LL Quân','Trần Vỹ','TQ Hoàn','Chiến Thắng'];
-const BCOLORS=['#1D9E75','#378ADD','#BA7517','#D85A30','#7F77DD','#D4537E'];
+const DATA={day:scale(1),week:scale(7),month:scale(30)};
 
 const fmt=n=>new Intl.NumberFormat('vi-VN').format(Math.round(n));
 const fmtM=n=>(n/1000000).toFixed(1)+'M';
 
 let session=null,period='day',curView='chain',curBranch=null;
 let cRev=null,cMargin=null,cHourly=null;
-let _refreshTimer=null;
 
-// ─────────────────────────────────────────────
-// AUTH
-// ─────────────────────────────────────────────
 function doLogin(){
   const u=document.getElementById('u').value.trim().toLowerCase();
   const p=document.getElementById('p').value;
@@ -419,10 +298,9 @@ function doLogin(){
     session={...USERS[u],username:u};
     document.getElementById('err').style.display='none';
     document.getElementById('login-page').style.display='none';
-    const app=document.getElementById('app');
-    app.style.display='flex';app.style.flexDirection='column';
+    document.getElementById('app').style.display='flex';
+    document.getElementById('app').style.flexDirection='column';
     document.getElementById('user-label').textContent=session.name;
-    _injectStatusBadge();
     if(session.role==='rm'){
       document.getElementById('nav-bar').style.display='flex';
       document.getElementById('tb-sub').textContent='Regional Manager · Toàn chuỗi';
@@ -433,11 +311,6 @@ function doLogin(){
       openDetail(session.branch);
       document.getElementById('back-btn').style.display='none';
     }
-    // Auto-refresh mỗi 15 phút
-    _refreshTimer=setInterval(()=>{
-      if(curView==='chain') renderChain();
-      else if(curView==='branch-detail'&&curBranch) renderDetail(curBranch);
-    }, 15*60*1000);
   } else {
     document.getElementById('err').style.display='block';
   }
@@ -446,8 +319,6 @@ document.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 
 function doLogout(){
   session=null;
-  if(_refreshTimer){clearInterval(_refreshTimer);_refreshTimer=null;}
-  Object.keys(_cache).forEach(k=>delete _cache[k]);
   document.getElementById('app').style.display='none';
   document.getElementById('login-page').style.display='flex';
   document.getElementById('u').value='';
@@ -456,9 +327,6 @@ function doLogout(){
   cRev=cMargin=cHourly=null;
 }
 
-// ─────────────────────────────────────────────
-// NAVIGATION
-// ─────────────────────────────────────────────
 function showView(v,btn){
   curView=v;
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
@@ -471,20 +339,19 @@ function showView(v,btn){
 
 function setPeriod(p,btn){
   period=p;
-  Object.keys(_cache).forEach(k=>delete _cache[k]); // flush cache khi đổi period
   document.querySelectorAll('.pb').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  if(curView==='chain') renderChain();
-  else if(curView==='branch-pick') renderPick();
-  else if(curView==='branch-detail'&&curBranch) renderDetail(curBranch);
-  else if(session?.role==='cht') renderDetail(session.branch);
+  if(curView==='chain')renderChain();
+  else if(curView==='branch-pick')renderPick();
+  else if(curView==='branch-detail'&&curBranch)renderDetail(curBranch);
+  else if(session?.role==='cht')renderDetail(session.branch);
 }
 
 function openDetail(b){
   curBranch=b;curView='branch-detail';
   document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
   document.getElementById('view-branch-detail').classList.add('active');
-  if(session&&session.role==='rm') document.getElementById('back-btn').style.display='flex';
+  if(session.role==='rm')document.getElementById('back-btn').style.display='flex';
   renderDetail(b);
 }
 
@@ -497,161 +364,124 @@ function goBack(){
   renderPick();
 }
 
-// ─────────────────────────────────────────────
-// RENDER: CHAIN
-// ─────────────────────────────────────────────
-async function renderChain(){
-  _loading('chain-kpis');
-  _loading('ranking-grid');
-  try {
-    const {totals,branches} = await getChainData(period);
-    const t=totals;
+function bd(){return DATA[period];}
 
-    document.getElementById('chain-kpis').innerHTML=`
-      <div class="metric"><div class="ml">Doanh thu chuỗi</div><div class="mv">${fmtM(t.revenue)}</div><div class="ms">VND · ${period==='day'?'hôm nay':period==='week'?'tuần này':'tháng này'}</div></div>
-      <div class="metric"><div class="ml">Tổng đơn</div><div class="mv">${fmt(t.orders)}</div><div class="ms">orders · 6 cơ sở</div></div>
-      <div class="metric"><div class="ml">Tổng lượng bán</div><div class="mv">${fmt(t.qty)}</div><div class="ms">ly / món</div></div>
-      <div class="metric"><div class="ml">Avg gross margin</div><div class="mv">${t.marginPct.toFixed(1)}%</div><div class="ms md ${t.marginPct>=60?'up':'dn'}">${t.marginPct>=60?'Tốt':'Cần cải thiện'}</div></div>
-      <div class="metric"><div class="ml">Cost NVL chuỗi</div><div class="mv">${fmtM(t.costNvl)}</div><div class="ms">${t.costPct.toFixed(1)}% doanh thu</div></div>`;
+function renderChain(){
+  const d=bd();
+  const sorted=[...BRANCHES].sort((a,b)=>d[b].rev-d[a].rev);
+  const totRev=BRANCHES.reduce((s,b)=>s+d[b].rev,0);
+  const totOrd=BRANCHES.reduce((s,b)=>s+d[b].orders,0);
+  const totQty=BRANCHES.reduce((s,b)=>s+d[b].qty,0);
+  const totCost=BRANCHES.reduce((s,b)=>s+d[b].cost,0);
+  const avgM=totRev>0?(totRev-totCost)/totRev*100:0;
+  const avgCost=totRev>0?totCost/totRev*100:0;
 
-    const maxRev=branches[0]?.revenue||1;
-    document.getElementById('ranking-grid').innerHTML=branches.map((b,i)=>{
-      const pct=Math.round(b.revenue/maxRev*100);
-      const rc=i===0?'r1':i===1?'r2':i===2?'r3':'rn';
-      return `<div class="bc${i===0?' top1':''}" onclick="openDetail('${b.branch}')">
-        <div class="bc-head"><span class="bc-name">${b.branch}</span><span class="rank-badge ${rc}">#${i+1}</span></div>
-        <div class="bc-rev">${fmtM(b.revenue)}</div>
-        <div class="bc-sub">${fmt(b.orders)} đơn · ${b.marginPct.toFixed(1)}% margin</div>
-        <div class="bc-bar"><div class="bc-fill" style="width:${pct}%"></div></div>
-      </div>`;
-    }).join('');
+  document.getElementById('chain-kpis').innerHTML=`
+    <div class="metric"><div class="ml">Doanh thu chuỗi</div><div class="mv">${fmtM(totRev)}</div><div class="ms">VND · ${period==='day'?'hôm nay':period==='week'?'tuần này':'tháng này'}</div></div>
+    <div class="metric"><div class="ml">Tổng đơn</div><div class="mv">${fmt(totOrd)}</div><div class="ms">orders · 6 cơ sở</div></div>
+    <div class="metric"><div class="ml">Tổng lượng bán</div><div class="mv">${fmt(totQty)}</div><div class="ms">ly / món</div></div>
+    <div class="metric"><div class="ml">Avg gross margin</div><div class="mv">${avgM.toFixed(1)}%</div><div class="ms md ${avgM>=60?'up':'dn'}">${avgM>=60?'Tốt':'Cần cải thiện'}</div></div>
+    <div class="metric"><div class="ml">Cost NVL chuỗi</div><div class="mv">${fmtM(totCost)}</div><div class="ms">${avgCost.toFixed(1)}% doanh thu</div></div>`;
 
-    document.getElementById('compare-tb').innerHTML=branches.map(b=>{
-      const pc=b.marginPct>=65?'pg':b.marginPct>=50?'py':'pr';
-      const lbl=b.marginPct>=65?'Tốt':b.marginPct>=50?'Đạt':'Thấp';
-      return `<tr><td style="font-weight:600">${b.branch}</td><td>${fmtM(b.revenue)}</td><td>${b.costPct.toFixed(1)}%</td><td>${b.marginPct.toFixed(1)}%</td><td><span class="pill ${pc}">${lbl}</span></td></tr>`;
-    }).join('');
+  const maxRev=d[sorted[0]].rev;
+  document.getElementById('ranking-grid').innerHTML=sorted.map((b,i)=>{
+    const margin=d[b].rev>0?(d[b].rev-d[b].cost)/d[b].rev*100:0;
+    const pct=Math.round(d[b].rev/maxRev*100);
+    const rc=i===0?'r1':i===1?'r2':i===2?'r3':'rn';
+    return `<div class="bc${i===0?' top1':''}" onclick="openDetail('${b}')">
+      <div class="bc-head"><span class="bc-name">${b}</span><span class="rank-badge ${rc}">#${i+1}</span></div>
+      <div class="bc-rev">${fmtM(d[b].rev)}</div>
+      <div class="bc-sub">${fmt(d[b].orders)} đơn · ${margin.toFixed(1)}% margin</div>
+      <div class="bc-bar"><div class="bc-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
 
-    // Top items — aggregate từ branches
-    const itemMap={};
-    branches.forEach(b=>(b.topItems||[]).forEach(i=>{
-      itemMap[i.name]=itemMap[i.name]||{name:i.name,qty:0,revenue:0};
-      itemMap[i.name].qty+=i.qty; itemMap[i.name].revenue+=i.revenue;
-    }));
-    const tops=Object.values(itemMap).sort((a,b)=>b.qty-a.qty).slice(0,5);
-    const maxQ=tops[0]?.qty||1;
-    document.getElementById('chain-top').innerHTML=tops.map((t,i)=>`
-      <div class="tr"><span class="tr-rank">#${i+1}</span><span class="tr-name">${t.name}</span>
-      <div class="tr-bar"><div class="tr-fill" style="width:${Math.round(t.qty/maxQ*100)}%"></div></div>
-      <span class="tr-qty">${fmt(t.qty)}</span><span class="tr-rev">${fmtM(t.revenue)}</span></div>`).join('');
+  document.getElementById('compare-tb').innerHTML=sorted.map(b=>{
+    const margin=d[b].rev>0?(d[b].rev-d[b].cost)/d[b].rev*100:0;
+    const costP=d[b].rev>0?d[b].cost/d[b].rev*100:0;
+    const pc=margin>=65?'pg':margin>=50?'py':'pr';
+    const lbl=margin>=65?'Tốt':margin>=50?'Đạt':'Thấp';
+    return `<tr><td style="font-weight:600">${b}</td><td>${fmtM(d[b].rev)}</td><td>${costP.toFixed(1)}%</td><td>${margin.toFixed(1)}%</td><td><span class="pill ${pc}">${lbl}</span></td></tr>`;
+  }).join('');
 
-    // Charts
-    if(cRev)cRev.destroy(); if(cMargin)cMargin.destroy();
-    const labels=branches.map(b=>b.branch);
-    const revs=branches.map(b=>Math.round(b.revenue/100000)/10);
-    const margins=branches.map(b=>b.marginPct);
-    const cols=branches.map(b=>BCOLORS[BRANCHES.indexOf(b.branch)]);
+  const itemMap={};
+  BRANCHES.forEach(b=>d[b].items.forEach(i=>{
+    itemMap[i.n]=itemMap[i.n]||{n:i.n,q:0,r:0};
+    itemMap[i.n].q+=i.q;itemMap[i.n].r+=i.r;
+  }));
+  const tops=Object.values(itemMap).sort((a,b)=>b.q-a.q).slice(0,5);
+  const maxQ=tops[0].q;
+  document.getElementById('chain-top').innerHTML=tops.map((t,i)=>`
+    <div class="tr"><span class="tr-rank">#${i+1}</span><span class="tr-name">${t.n}</span>
+    <div class="tr-bar"><div class="tr-fill" style="width:${Math.round(t.q/maxQ*100)}%"></div></div>
+    <span class="tr-qty">${fmt(t.q)}</span><span class="tr-rev">${fmtM(t.r)}</span></div>`).join('');
 
-    cRev=new Chart(document.getElementById('c-rev'),{type:'bar',data:{labels,datasets:[{label:'Doanh thu (M)',data:revs,backgroundColor:cols.map(c=>c+'BB'),borderColor:cols,borderWidth:1.5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:10}},grid:{display:false}},y:{ticks:{font:{size:10},callback:v=>v+'M'},grid:{color:'rgba(128,128,128,0.08)'}}}}});
-    cMargin=new Chart(document.getElementById('c-margin'),{type:'bar',data:{labels,datasets:[{label:'Margin %',data:margins,backgroundColor:margins.map(m=>m>=65?'#1D9E75BB':m>=50?'#BA7517BB':'#A32D2DBB'),borderColor:margins.map(m=>m>=65?'#1D9E75':m>=50?'#BA7517':'#A32D2D'),borderWidth:1.5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:10}},grid:{display:false}},y:{min:0,max:100,ticks:{font:{size:10},callback:v=>v+'%'},grid:{color:'rgba(128,128,128,0.08)'}}}}});
+  if(cRev)cRev.destroy();
+  if(cMargin)cMargin.destroy();
+  const revs=sorted.map(b=>Math.round(d[b].rev/100000)/10);
+  const margins=sorted.map(b=>b in d&&d[b].rev>0?Math.round((d[b].rev-d[b].cost)/d[b].rev*1000)/10:0);
+  const cols=sorted.map(b=>BCOLORS[BRANCHES.indexOf(b)]);
 
-  } catch(e) {
-    _error('chain-kpis', e.message);
-    _error('ranking-grid', e.message);
-    console.error('renderChain:', e);
-  }
+  cRev=new Chart(document.getElementById('c-rev'),{type:'bar',data:{labels:sorted,datasets:[{label:'Doanh thu (M)',data:revs,backgroundColor:cols.map(c=>c+'BB'),borderColor:cols,borderWidth:1.5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:10}},grid:{display:false}},y:{ticks:{font:{size:10},callback:v=>v+'M'},grid:{color:'rgba(128,128,128,0.08)'}}}}});
+
+  cMargin=new Chart(document.getElementById('c-margin'),{type:'bar',data:{labels:sorted,datasets:[{label:'Margin %',data:margins,backgroundColor:margins.map(m=>m>=65?'#1D9E75BB':m>=50?'#BA7517BB':'#A32D2DBB'),borderColor:margins.map(m=>m>=65?'#1D9E75':m>=50?'#BA7517':'#A32D2D'),borderWidth:1.5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:10}},grid:{display:false}},y:{min:0,max:100,ticks:{font:{size:10},callback:v=>v+'%'},grid:{color:'rgba(128,128,128,0.08)'}}}}});
 }
 
-// ─────────────────────────────────────────────
-// RENDER: BRANCH PICK
-// ─────────────────────────────────────────────
-async function renderPick(){
-  _loading('pick-grid');
-  try {
-    const {branches} = await getChainData(period);
-    const maxRev=branches[0]?.revenue||1;
-    document.getElementById('pick-grid').innerHTML=branches.map((b,i)=>{
-      const pct=Math.round(b.revenue/maxRev*100);
-      const rc=i===0?'r1':i===1?'r2':i===2?'r3':'rn';
-      return `<div class="bc${i===0?' top1':''}" onclick="openDetail('${b.branch}')">
-        <div class="bc-head"><span class="bc-name">${b.branch}</span><span class="rank-badge ${rc}">#${i+1}</span></div>
-        <div class="bc-rev">${fmtM(b.revenue)}</div>
-        <div class="bc-sub">${fmt(b.orders)} đơn · ${b.marginPct.toFixed(1)}% margin</div>
-        <div class="bc-bar"><div class="bc-fill" style="width:${pct}%"></div></div>
-      </div>`;
-    }).join('');
-  } catch(e) { _error('pick-grid', e.message); }
+function renderPick(){
+  const d=bd();
+  const sorted=[...BRANCHES].sort((a,b)=>d[b].rev-d[a].rev);
+  const maxRev=d[sorted[0]].rev;
+  document.getElementById('pick-grid').innerHTML=sorted.map((b,i)=>{
+    const margin=d[b].rev>0?(d[b].rev-d[b].cost)/d[b].rev*100:0;
+    const pct=Math.round(d[b].rev/maxRev*100);
+    const rc=i===0?'r1':i===1?'r2':i===2?'r3':'rn';
+    return `<div class="bc${i===0?' top1':''}" onclick="openDetail('${b}')">
+      <div class="bc-head"><span class="bc-name">${b}</span><span class="rank-badge ${rc}">#${i+1}</span></div>
+      <div class="bc-rev">${fmtM(d[b].rev)}</div>
+      <div class="bc-sub">${fmt(d[b].orders)} đơn · ${margin.toFixed(1)}% margin</div>
+      <div class="bc-bar"><div class="bc-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
 }
 
-// ─────────────────────────────────────────────
-// RENDER: BRANCH DETAIL
-// ─────────────────────────────────────────────
-async function renderDetail(branch){
-  _loading('d-kpis');
-  _loading('d-top');
-  _loading('d-pl');
-  _loading('d-stock');
-  try {
-    const d = await getBranchData(branch, period);
-    document.getElementById('d-name').textContent=branch;
-    document.getElementById('d-sub').textContent=`Cơ sở ${branch} · ${period==='day'?'hôm nay':period==='week'?'tuần này':'tháng này'}`;
-
-    // Alert NVL
-    const low=(d.stock||[]).filter(s=>s.status&&s.status!=='Đủ');
-    const al=document.getElementById('d-alert');
-    if(low.length){al.style.display='flex';document.getElementById('d-alert-txt').textContent=`${low.length} NVL cần chú ý: ${low.map(s=>s.nvlName||s.name).join(', ')}`;}
-    else al.style.display='none';
-
-    // KPIs
-    const margin=d.marginPct||0, costP=d.costPct||0;
-    document.getElementById('d-kpis').innerHTML=`
-      <div class="metric"><div class="ml">Doanh thu</div><div class="mv">${fmtM(d.revenue||0)}</div><div class="ms">VND</div></div>
-      <div class="metric"><div class="ml">Số đơn</div><div class="mv">${fmt(d.orders||0)}</div><div class="ms">orders</div></div>
-      <div class="metric"><div class="ml">Lượng bán</div><div class="mv">${fmt(d.qty||0)}</div><div class="ms">ly/món</div></div>
-      <div class="metric"><div class="ml">Gross margin</div><div class="mv">${margin.toFixed(1)}%</div><div class="ms md ${margin>=65?'up':margin>=50?'':'dn'}">${margin>=65?'Tốt':margin>=50?'Đạt':'Cần cải thiện'}</div></div>`;
-
-    // Top items
-    const items=d.topItems||[];
-    const maxQ=items[0]?.qty||1;
-    document.getElementById('d-top').innerHTML=items.length
-      ? items.map((t,i)=>`<div class="tr"><span class="tr-rank">#${i+1}</span><span class="tr-name">${t.name}</span>
-          <div class="tr-bar"><div class="tr-fill" style="width:${Math.round(t.qty/maxQ*100)}%"></div></div>
-          <span class="tr-qty">${fmt(t.qty)}</span><span class="tr-rev">${fmtM(t.revenue)}</span></div>`).join('')
-      : '<div style="padding:12px;font-size:12px;color:var(--muted)">Chưa có dữ liệu</div>';
-
-    // P&L
-    const gross=d.grossProfit||0;
-    document.getElementById('d-pl').innerHTML=`
-      <div class="pl-row"><span style="color:var(--muted)">Doanh thu</span><span>${fmt(d.revenue||0)} đ</span></div>
-      <div class="pl-row"><span style="color:var(--muted)">— Cost NVL</span><span style="color:#A32D2D">- ${fmt(d.costNvl||0)} đ</span></div>
-      <div class="pl-row total"><span>Gross Profit</span><span style="color:#1D9E75">${fmt(gross)} đ</span></div>
-      <div style="height:5px;background:var(--bg);border-radius:3px;margin-top:10px;overflow:hidden"><div style="height:100%;border-radius:3px;background:#1D9E75;width:${Math.min(margin,100).toFixed(0)}%"></div></div>
-      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:6px"><span>Cost ${costP.toFixed(1)}%</span><span>Margin ${margin.toFixed(1)}%</span></div>`;
-
-    // Stock
-    const stock=d.stock||[];
-    document.getElementById('d-stock').innerHTML=stock.length
-      ? stock.map(s=>{
-          const st=s.status||'Đủ';
-          const ok=st==='Đủ',warn=st==='Sắp hết';
-          return `<div class="stock-row">
-            <i class="ti ti-${ok?'circle-check':warn?'alert-circle':'circle-x'}" style="font-size:16px;color:${ok?'#1D9E75':warn?'#BA7517':'#A32D2D'}"></i>
-            <span style="flex:1">${s.nvlName||s.name||'—'}</span>
-            <span class="pill ${ok?'pg':warn?'py':'pr'}">${st}</span>
-          </div>`;}).join('')
-      : '<div style="padding:12px;font-size:12px;color:var(--muted)">Chưa có dữ liệu kiểm kho</div>';
-
-    // Hourly chart
-    if(cHourly)cHourly.destroy();
-    const hours=(d.hourly||[]);
-    if(hours.length){
-      cHourly=new Chart(document.getElementById('c-hourly'),{type:'line',data:{labels:hours.map(h=>h.hour),datasets:[{label:'Doanh thu',data:hours.map(h=>h.revenue),borderColor:'#1D9E75',backgroundColor:'rgba(29,158,117,0.07)',borderWidth:2,pointRadius:2,tension:0.4,fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:10},maxRotation:0},grid:{display:false}},y:{ticks:{font:{size:10},callback:v=>Math.round(v/1000)+'k'},grid:{color:'rgba(128,128,128,0.08)'}}}}});
-    }
-
-  } catch(e) {
-    _error('d-kpis', e.message);
-    console.error('renderDetail:', e);
-  }
+function renderDetail(branch){
+  const d=bd()[branch];
+  document.getElementById('d-name').textContent=branch;
+  document.getElementById('d-sub').textContent=`Cơ sở ${branch} · ${period==='day'?'hôm nay':period==='week'?'tuần này':'tháng này'}`;
+  const low=d.stock.filter(s=>s.s!=='ok');
+  const al=document.getElementById('d-alert');
+  if(low.length){al.style.display='flex';document.getElementById('d-alert-txt').textContent=`${low.length} NVL cần chú ý: ${low.map(s=>s.n).join(', ')}`;}
+  else al.style.display='none';
+  const margin=d.rev>0?(d.rev-d.cost)/d.rev*100:0;
+  const costP=d.rev>0?d.cost/d.rev*100:0;
+  document.getElementById('d-kpis').innerHTML=`
+    <div class="metric"><div class="ml">Doanh thu</div><div class="mv">${fmtM(d.rev)}</div><div class="ms">VND</div></div>
+    <div class="metric"><div class="ml">Số đơn</div><div class="mv">${fmt(d.orders)}</div><div class="ms">orders</div></div>
+    <div class="metric"><div class="ml">Lượng bán</div><div class="mv">${fmt(d.qty)}</div><div class="ms">ly/món</div></div>
+    <div class="metric"><div class="ml">Gross margin</div><div class="mv">${margin.toFixed(1)}%</div><div class="ms md ${margin>=65?'up':margin>=50?'':'dn'}">${margin>=65?'Tốt':margin>=50?'Đạt':'Cần cải thiện'}</div></div>`;
+  const maxQ=d.items[0].q;
+  document.getElementById('d-top').innerHTML=d.items.map((t,i)=>`
+    <div class="tr"><span class="tr-rank">#${i+1}</span><span class="tr-name">${t.n}</span>
+    <div class="tr-bar"><div class="tr-fill" style="width:${Math.round(t.q/maxQ*100)}%"></div></div>
+    <span class="tr-qty">${fmt(t.q)}</span><span class="tr-rev">${fmtM(t.r)}</span></div>`).join('');
+  const gross=d.rev-d.cost;
+  document.getElementById('d-pl').innerHTML=`
+    <div class="pl-row"><span style="color:var(--muted)">Doanh thu</span><span>${fmt(d.rev)} đ</span></div>
+    <div class="pl-row"><span style="color:var(--muted)">— Cost NVL</span><span style="color:#A32D2D">- ${fmt(d.cost)} đ</span></div>
+    <div class="pl-row total"><span>Gross Profit</span><span style="color:#1D9E75">${fmt(gross)} đ</span></div>
+    <div style="height:5px;background:var(--bg);border-radius:3px;margin-top:10px;overflow:hidden"><div style="height:100%;border-radius:3px;background:#1D9E75;width:${Math.min(margin,100).toFixed(0)}%"></div></div>
+    <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:6px"><span>Cost ${costP.toFixed(1)}%</span><span>Margin ${margin.toFixed(1)}%</span></div>`;
+  document.getElementById('d-stock').innerHTML=d.stock.map(s=>`
+    <div class="stock-row">
+      <i class="ti ti-${s.s==='ok'?'circle-check':s.s==='warn'?'alert-circle':'circle-x'}" style="font-size:16px;color:${s.s==='ok'?'#1D9E75':s.s==='warn'?'#BA7517':'#A32D2D'}"></i>
+      <span style="flex:1">${s.n}</span>
+      <span class="pill ${s.s==='ok'?'pg':s.s==='warn'?'py':'pr'}">${s.s==='ok'?'Đủ':s.s==='warn'?'Sắp hết':'Hết hàng'}</span>
+    </div>`).join('');
+  if(cHourly)cHourly.destroy();
+  const hrs=['8h','9h','10h','11h','12h','13h','14h','15h','16h','17h','18h','19h','20h'];
+  const seed=branch.length+period.length;
+  const vals=hrs.map((_,i)=>Math.max(0,Math.round(d.rev/hrs.length*(0.5+Math.sin(i*0.8+seed)*0.35+Math.random()*0.18))));
+  cHourly=new Chart(document.getElementById('c-hourly'),{type:'line',data:{labels:hrs,datasets:[{label:'Doanh thu',data:vals,borderColor:'#1D9E75',backgroundColor:'rgba(29,158,117,0.07)',borderWidth:2,pointRadius:2,tension:0.4,fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:10},maxRotation:0},grid:{display:false}},y:{ticks:{font:{size:10},callback:v=>Math.round(v/1000)+'k'},grid:{color:'rgba(128,128,128,0.08)'}}}}});
 }
 </script>
 </body>
