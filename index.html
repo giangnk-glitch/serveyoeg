@@ -1,379 +1,658 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>OEG — M7 Chỉ số CLDV</title>
-<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OEG FnB Dashboard — Chuỗi + Từng cơ sở</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.10.0/dist/tabler-icons.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
-:root{
-  --neon:#B4F400;--red:#E8324A;--amber:#F0A500;--blue:#3B8BF5;--green:#3DD68C;--purple:#9D6EF5;
-  --bg:#080A0D;--bg2:#0D1117;--bg3:#131920;--bg4:#1A2230;
-  --border:rgba(255,255,255,0.06);--border2:rgba(180,244,0,0.18);
-  --text:#E6EDF3;--muted:#7D8590;--dim:#3D444D;
-  --font:'Be Vietnam Pro',sans-serif;--mono:'JetBrains Mono',monospace;
-}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh}
-.sidebar{width:196px;background:var(--bg2);border-right:1px solid var(--border);position:fixed;top:0;left:0;bottom:0;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
-.sidebar-logo{padding:16px 14px;border-bottom:1px solid var(--border)}
-.logo-mark{display:flex;align-items:center;gap:8px}
-.logo-icon{width:30px;height:30px;background:var(--red);border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:11px;color:#fff;flex-shrink:0}
-.logo-text{font-size:12px;font-weight:700}.logo-sub{font-size:10px;color:var(--muted)}
-.nav-lbl{font-size:9px;font-weight:700;letter-spacing:1.5px;color:var(--dim);padding:10px 14px 5px;text-transform:uppercase}
-.nav-item{display:flex;align-items:center;gap:8px;padding:7px 14px;font-size:12px;color:var(--muted);transition:all .15s;text-decoration:none;cursor:pointer}
-.nav-item:hover{background:var(--bg3);color:var(--text)}
-.nav-item.active{background:rgba(180,244,0,0.08);color:var(--neon);border-right:2px solid var(--neon)}
-.dot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
-.nav-div{height:1px;background:var(--border);margin:6px 14px}
-.main{margin-left:196px;min-height:100vh}
-.topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 22px;height:50px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
-.bc{font-size:12px;color:var(--muted);font-family:var(--mono)}
-.bc b{color:var(--text)}
-.clk{font-family:var(--mono);font-size:11px;color:var(--dim)}
-.rbtn{display:flex;align-items:center;gap:5px;background:rgba(180,244,0,0.08);border:1px solid var(--border2);border-radius:6px;padding:5px 10px;font-size:11px;font-weight:600;color:var(--neon);cursor:pointer;font-family:var(--font)}
-.rbtn:hover{background:rgba(180,244,0,0.15)}
-.content{padding:18px 22px}
-.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
-.page-title{font-size:20px;font-weight:900;display:flex;align-items:center;gap:8px}
-.page-meta{font-size:11px;color:var(--muted);margin-top:4px;font-family:var(--mono)}
-.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;font-family:var(--mono)}
-.bn{background:rgba(180,244,0,0.1);color:var(--neon);border:1px solid rgba(180,244,0,0.2)}
-.bb{background:rgba(59,139,245,0.12);color:var(--blue);border:1px solid rgba(59,139,245,0.2)}
-.bg{background:rgba(61,214,140,0.12);color:var(--green);border:1px solid rgba(61,214,140,0.2)}
-.ba{background:rgba(240,165,0,0.12);color:var(--amber);border:1px solid rgba(240,165,0,0.2)}
-.br{background:rgba(232,50,74,0.12);color:var(--red);border:1px solid rgba(232,50,74,0.2)}
-.week-bar{display:flex;gap:5px;margin-bottom:16px;flex-wrap:wrap}
-.wbtn{padding:4px 11px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border);color:var(--muted);background:transparent;font-family:var(--mono)}
-.wbtn.active{background:rgba(180,244,0,0.1);border-color:var(--neon);color:var(--neon)}
-.loading{display:flex;align-items:center;justify-content:center;padding:60px;gap:10px;color:var(--muted);font-size:13px}
-.spin{width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--neon);border-radius:50%;animation:spin .7s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:10px;margin-bottom:16px}
-.kc{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;position:relative;overflow:hidden}
-.kc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--ac,var(--neon))}
-.kl{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px}
-.kv{font-size:26px;font-weight:900;font-family:var(--mono);line-height:1;margin-bottom:4px}
-.ks{font-size:11px;color:var(--muted)}
-.kb{height:3px;background:var(--bg4);border-radius:2px;margin-top:10px}
-.kbf{height:100%;border-radius:2px;transition:width .6s}
-.kdot{position:absolute;top:11px;right:11px;width:7px;height:7px;border-radius:50%;animation:pd 2s infinite}
-.dok{background:var(--green);box-shadow:0 0 6px rgba(61,214,140,.5)}
-.dwarn{background:var(--amber);box-shadow:0 0 6px rgba(240,165,0,.5)}
-.dbad{background:var(--red);box-shadow:0 0 6px rgba(232,50,74,.5)}
-@keyframes pd{0%,100%{opacity:1}50%{opacity:.35}}
-.bench-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
-.bench-c{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px}
-.bct{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
-.bcr{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border)}
-.bcr:last-child{border-bottom:none}
-.bcl{font-size:12px;color:var(--muted)}
-.bcv{font-family:var(--mono);font-size:13px;font-weight:600}
-.charts-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
-.cc{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden}
-.cch{padding:12px 16px;border-bottom:1px solid var(--border);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:space-between}
-.ccb{padding:14px;height:210px}
-.seg-bar{display:flex;height:9px;border-radius:5px;overflow:hidden;gap:2px;margin:8px 0}
-.s-pro{background:var(--green)}.s-pas{background:var(--amber)}.s-det{background:var(--red)}
-.seg-leg{display:flex;gap:14px;flex-wrap:wrap}
-.si{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted)}
-.sd{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.sc{background:var(--bg2);border:1px solid var(--border);border-radius:10px;margin-bottom:14px;overflow:hidden}
-.sch{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:700}
-.br-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:10px;padding:14px}
-.brc{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px}
-.brn{font-size:12px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
-.bm-g{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
-.bm{text-align:center}
-.bmv{font-size:17px;font-weight:800;font-family:var(--mono);line-height:1}
-.bml{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
-.bmn{font-size:10px;color:var(--dim);font-family:var(--mono)}
-.bok{border-left:3px solid var(--green)}.bwarn{border-left:3px solid var(--amber)}.bbad{border-left:3px solid var(--red)}.bnew{border-left:3px solid var(--blue)}
-.ac-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
-.al{padding:0 14px 14px;display:flex;flex-direction:column;gap:7px}
-.ai{padding:9px 11px;border-radius:7px;font-size:12px;line-height:1.5}
-.ai.aok{background:rgba(61,214,140,0.1);border:1px solid rgba(61,214,140,.2);color:var(--green)}
-.ai.awn{background:rgba(240,165,0,0.1);border:1px solid rgba(240,165,0,.2);color:var(--amber)}
-.ai.abd{background:rgba(232,50,74,0.1);border:1px solid rgba(232,50,74,.2);color:var(--red)}
-.cl{padding:0 14px 14px;display:flex;flex-direction:column;gap:7px}
-.ci{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:9px 11px;display:flex;gap:8px}
-.ci.pos{border-left:2px solid var(--green)}.ci.neg{border-left:2px solid var(--red)}
-.ct{font-size:12px;color:var(--muted);line-height:1.5;flex:1}
-.cm{font-size:10px;color:var(--dim);font-family:var(--mono);margin-top:3px}
-.emp{text-align:center;padding:28px;color:var(--dim);font-size:12px}
-::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f4;color:#1c1c1a;min-height:100vh}
+:root{
+  --green:#1D9E75;--green-dark:#0F6E56;--green-light:#E1F5EE;--green-text:#085041;
+  --border:#e5e4de;--bg:#f5f5f4;--card:#fff;--text:#1c1c1a;--muted:#73726c;--faint:#b4b2a9;
+  --danger-bg:#fcebeb;--danger-text:#791f1f;--danger-border:#f09595;
+  --warn-bg:#faeeda;--warn-text:#633806;--warn-border:#ef9f27;
+  --info-bg:#e6f1fb;--info-text:#0c447c;
+}
+@media(prefers-color-scheme:dark){
+  body{background:#1c1c1a;color:#e8e6de}
+  :root{--border:#3a3936;--bg:#1c1c1a;--card:#252522;--text:#e8e6de;--muted:#9c9a92;--faint:#5f5e5a;
+    --green-light:#04342C;--green-text:#9FE1CB;
+    --danger-bg:#2a1010;--danger-text:#f09595;--warn-bg:#261a05;--warn-text:#fac775;--info-bg:#061a30;--info-text:#85b7eb}
+}
+
+/* Login */
+.login-page{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:1rem}
+.login-box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:2rem;width:100%;max-width:360px}
+.logo{width:40px;height:40px;background:var(--green);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:1.25rem}
+.logo i{font-size:20px;color:#fff}
+h1{font-size:18px;font-weight:600;margin-bottom:4px}
+.login-sub{font-size:13px;color:var(--muted);margin-bottom:1.5rem}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:11px;color:var(--muted);margin-bottom:4px;font-weight:500}
+.field input,.field select{width:100%;padding:9px 12px;font-size:13px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);outline:none}
+.field input:focus{border-color:var(--green)}
+.btn-primary{width:100%;padding:10px;font-size:13px;font-weight:600;border:none;border-radius:8px;background:var(--green);color:#fff;cursor:pointer}
+.btn-primary:hover{background:var(--green-dark)}
+.err{font-size:12px;color:var(--danger-text);margin-top:8px;display:none}
+.demo-accounts{margin-top:16px;padding-top:14px;border-top:1px solid var(--border);font-size:11px;color:var(--faint)}
+.demo-accounts strong{display:block;margin-bottom:6px;color:var(--muted)}
+.demo-row{margin-bottom:4px}
+code{font-family:monospace;font-size:11px;background:var(--bg);padding:1px 5px;border-radius:4px;color:var(--text)}
+
+/* App shell */
+.app{display:none;min-height:100vh;flex-direction:column}
+.topbar{background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:12px 20px;position:sticky;top:0;z-index:10}
+.topbar-left{display:flex;align-items:center;gap:10px}
+.tb-logo{width:32px;height:32px;background:var(--green);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff;font-weight:700}
+.tb-title{font-size:14px;font-weight:600}
+.tb-sub{font-size:11px;color:var(--muted)}
+.tb-right{display:flex;align-items:center;gap:8px}
+.user-chip{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);cursor:pointer;padding:5px 10px;border-radius:8px;border:1px solid var(--border)}
+.user-chip:hover{background:var(--bg)}
+
+/* Nav */
+.nav-bar{background:var(--card);border-bottom:1px solid var(--border);display:flex;padding:0 20px;gap:2px}
+.nav-btn{padding:10px 16px;font-size:12px;font-weight:500;cursor:pointer;border:none;background:transparent;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px}
+.nav-btn.active{color:var(--green);border-bottom-color:var(--green)}
+.nav-btn i{font-size:14px;vertical-align:-2px;margin-right:5px}
+
+/* Main content */
+.main{padding:20px;flex:1}
+.period-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.period-btns{display:flex;gap:4px}
+.pb{padding:5px 12px;font-size:11px;font-weight:500;border-radius:20px;border:1px solid var(--border);cursor:pointer;background:transparent;color:var(--muted)}
+.pb.active{background:var(--green);border-color:var(--green);color:#fff}
+.period-label{font-size:11px;color:var(--muted)}
+
+/* Metrics */
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px}
+.metric{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px}
+.metric .ml{font-size:11px;color:var(--muted);margin-bottom:4px}
+.metric .mv{font-size:22px;font-weight:600;color:var(--text)}
+.metric .ms{font-size:11px;color:var(--muted);margin-top:2px}
+.metric .md{font-size:11px;font-weight:500;margin-top:3px}
+.up{color:#1D9E75}.dn{color:#A32D2D}
+
+/* Cards */
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px}
+.card-hd{font-size:12px;font-weight:600;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.card-hd i{font-size:14px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+@media(max-width:600px){.two-col{grid-template-columns:1fr}}
+
+/* Branch cards */
+.branch-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:12px}
+.bc{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;cursor:pointer;transition:border-color .15s}
+.bc:hover{border-color:var(--green)}
+.bc.top1{border-left:3px solid var(--green)}
+.bc-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.bc-name{font-size:13px;font-weight:600}
+.rank-badge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px}
+.r1{background:var(--green-light);color:var(--green-text)}
+.r2{background:var(--info-bg);color:var(--info-text)}
+.r3{background:var(--warn-bg);color:var(--warn-text)}
+.rn{background:var(--bg);color:var(--muted)}
+.bc-rev{font-size:18px;font-weight:700;color:var(--text)}
+.bc-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.bc-bar{height:4px;background:var(--bg);border-radius:2px;margin-top:10px;overflow:hidden}
+.bc-fill{height:100%;border-radius:2px;background:var(--green)}
+
+/* Compare table */
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{text-align:left;padding:7px 10px;background:var(--bg);color:var(--muted);font-size:11px;font-weight:600;border-bottom:1px solid var(--border)}
+.tbl td{padding:8px 10px;border-bottom:1px solid var(--border);color:var(--text)}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:var(--bg)}
+.pill{display:inline-block;font-size:10px;padding:2px 7px;border-radius:20px;font-weight:600}
+.pg{background:var(--green-light);color:var(--green-text)}
+.py{background:var(--warn-bg);color:var(--warn-text)}
+.pr{background:var(--danger-bg);color:var(--danger-text)}
+
+/* Top items */
+.tr{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px}
+.tr:last-child{border-bottom:none}
+.tr-rank{width:18px;font-size:11px;color:var(--faint);font-weight:600}
+.tr-name{flex:1}
+.tr-bar{flex:2;height:5px;background:var(--bg);border-radius:3px;overflow:hidden}
+.tr-fill{height:100%;border-radius:3px;background:var(--green)}
+.tr-qty{font-size:11px;color:var(--muted);min-width:38px;text-align:right}
+.tr-rev{font-size:12px;font-weight:600;min-width:52px;text-align:right}
+
+/* Branch detail */
+.back-btn{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);cursor:pointer;margin-bottom:14px;width:fit-content}
+.back-btn:hover{color:var(--text)}
+.branch-hero{margin-bottom:16px}
+.branch-hero h2{font-size:20px;font-weight:700}
+.branch-hero p{font-size:12px;color:var(--muted);margin-top:3px}
+.alert-box{display:flex;align-items:center;gap:8px;background:var(--warn-bg);border:1px solid var(--warn-border);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--warn-text);margin-bottom:14px}
+.stock-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px}
+.stock-row:last-child{border-bottom:none}
+.pl-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.pl-row:last-child{border-bottom:none}
+.pl-row.total{font-weight:700;font-size:14px}
+.chart-wrap{position:relative;width:100%;height:190px}
+
+/* View switch */
+.view{display:none}
+.view.active{display:block}
 </style>
 </head>
 <body>
-<div class="sidebar">
-  <div class="sidebar-logo">
-    <div class="logo-mark">
-      <div class="logo-icon">OCH</div>
-      <div><div class="logo-text">OEG Cyber Hub</div><div class="logo-sub">Chain Dashboard</div></div>
+
+<!-- LOGIN -->
+<div class="login-page" id="login-page">
+  <div class="login-box">
+    <div class="logo"><i class="ti ti-building-store"></i></div>
+    <h1>OEG FnB Dashboard</h1>
+    <p class="login-sub">Đăng nhập để tiếp tục</p>
+    <div class="field"><label>Tài khoản</label><input id="u" type="text" placeholder="VD: rm.andrew" autocomplete="off"></div>
+    <div class="field"><label>Mật khẩu</label><input id="p" type="password" placeholder="••••••••"></div>
+    <button class="btn-primary" onclick="doLogin()">Đăng nhập</button>
+    <div class="err" id="err">Sai tài khoản hoặc mật khẩu</div>
+    <div class="demo-accounts">
+      <strong>Tài khoản demo:</strong>
+      <div class="demo-row"><code>rm.andrew</code> / <code>oeg2024</code> — Regional Manager (xem toàn chuỗi)</div>
+      <div class="demo-row"><code>cht.tayson</code> / <code>oeg2024</code> — CHT Tây Sơn</div>
+      <div class="demo-row"><code>cht.stadium</code> / <code>oeg2024</code> — CHT Stadium</div>
     </div>
   </div>
-  <div class="nav-lbl">Báo cáo</div>
-  <a href="OEG_M1_Dashboard.html" class="nav-item"><span class="dot"></span>M1 — Tổng quan</a>
-  <a href="OEG_M2_Fnet.html" class="nav-item"><span class="dot"></span>M2 — Fnet</a>
-  <a href="OEG_M3_FnB_Mart.html" class="nav-item"><span class="dot"></span>M3 — FnB & Mart</a>
-  <a href="OEG_M4_NhanSu.html" class="nav-item"><span class="dot"></span>M4 — Nhân sự</a>
-  <a href="OEG_M5_PhongMay.html" class="nav-item"><span class="dot"></span>M5 — Phòng máy</a>
-  <a href="OEG_M6_PL.html" class="nav-item"><span class="dot"></span>M6 — P&amp;L</a>
-  <a href="OEG_M7_CLDV.html" class="nav-item active"><span class="dot"></span>M7 — CLDV</a>
-  <div class="nav-div"></div>
-  <div class="nav-lbl">Hệ thống</div>
-  <a href="OEG_Survey.html" class="nav-item"><span class="dot"></span>Form khảo sát</a>
-  <a href="OEG_Wiki.html" class="nav-item"><span class="dot"></span>Wiki / SOP</a>
 </div>
 
-<div class="main">
+<!-- APP -->
+<div class="app" id="app">
+  <!-- Topbar -->
   <div class="topbar">
-    <div class="bc">Dashboard / <b>M7 — Chất lượng dịch vụ</b></div>
-    <div style="display:flex;align-items:center;gap:10px">
-      <span class="clk" id="clk"></span>
-      <button class="rbtn" onclick="loadData()">↻ Làm mới</button>
+    <div class="topbar-left">
+      <div class="tb-logo">F</div>
+      <div><div class="tb-title" id="tb-title">FnB Dashboard</div><div class="tb-sub" id="tb-sub">OEG Cyber Hub</div></div>
+    </div>
+    <div class="tb-right">
+      <div class="user-chip" onclick="doLogout()">
+        <i class="ti ti-user" style="font-size:14px"></i>
+        <span id="user-label">—</span>
+        <i class="ti ti-logout" style="font-size:13px"></i>
+      </div>
     </div>
   </div>
-  <div class="content">
-    <div class="page-header">
-      <div>
-        <div class="page-title">Chỉ số CLDV <span class="badge bn">LIVE</span></div>
-        <div class="page-meta" id="meta">Đang tải...</div>
+
+  <!-- Nav (RM only) -->
+  <div class="nav-bar" id="nav-bar" style="display:none">
+    <button class="nav-btn active" onclick="showView('chain',this)"><i class="ti ti-building-store"></i>Toàn chuỗi</button>
+    <button class="nav-btn" onclick="showView('branch-pick',this)"><i class="ti ti-map-pin"></i>Từng cơ sở</button>
+  </div>
+
+  <div class="main">
+    <!-- Period -->
+    <div class="period-row">
+      <div class="period-btns">
+        <button class="pb active" onclick="setPeriod('day',this)">Hôm nay</button>
+        <button class="pb" onclick="setPeriod('week',this)">Tuần</button>
+        <button class="pb" onclick="setPeriod('month',this)">Tháng</button>
       </div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap">
-        <span class="badge bb">CSAT target ≥ 80%</span>
-        <span class="badge bb">NPS target ≥ 30</span>
-        <span class="badge ba">Collect ≥ 30 phiếu/cs/tuần</span>
+      <div class="period-label" id="period-lbl">Thứ Bảy, 09/05/2026</div>
+    </div>
+
+    <!-- VIEW: CHAIN -->
+    <div class="view active" id="view-chain">
+      <div class="metrics" id="chain-kpis"></div>
+      <div class="card">
+        <div class="card-hd"><i class="ti ti-list-numbers"></i>Xếp hạng cơ sở — doanh thu FnB</div>
+        <div class="branch-grid" id="ranking-grid"></div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <div class="card-hd"><i class="ti ti-chart-bar"></i>Doanh thu theo cơ sở</div>
+          <div class="chart-wrap"><canvas id="c-rev" role="img" aria-label="Doanh thu FnB 6 cơ sở">Dữ liệu doanh thu.</canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-hd"><i class="ti ti-percentage"></i>Gross margin % theo cơ sở</div>
+          <div class="chart-wrap"><canvas id="c-margin" role="img" aria-label="Margin % 6 cơ sở">Dữ liệu margin.</canvas></div>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <div class="card-hd"><i class="ti ti-trophy"></i>Top món — toàn chuỗi</div>
+          <div id="chain-top"></div>
+        </div>
+        <div class="card">
+          <div class="card-hd"><i class="ti ti-table"></i>So sánh chi tiết</div>
+          <div style="overflow-x:auto">
+            <table class="tbl">
+              <thead><tr><th>Cơ sở</th><th>Doanh thu</th><th>Cost%</th><th>Margin%</th><th>Đánh giá</th></tr></thead>
+              <tbody id="compare-tb"></tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="week-bar" id="weekBar"></div>
-    <div class="loading" id="ldg"><div class="spin"></div>Đang tải từ Google Sheets...</div>
-    <div id="dash" style="display:none">
-      <div class="kpi-grid" id="kpiGrid"></div>
-      <div class="bench-row" id="benchRow"></div>
-      <div class="charts-2">
-        <div class="cc">
-          <div class="cch">📈 CSAT% theo tuần <span class="badge bg" id="csatLast"></span></div>
-          <div class="ccb"><canvas id="csatC"></canvas></div>
-        </div>
-        <div class="cc">
-          <div class="cch">🎯 NPS theo tuần <span class="badge bb" id="npsLast"></span></div>
-          <div class="ccb"><canvas id="npsC"></canvas></div>
-        </div>
+
+    <!-- VIEW: BRANCH PICK -->
+    <div class="view" id="view-branch-pick">
+      <p style="font-size:12px;color:var(--muted);margin-bottom:12px">Chọn cơ sở để xem chi tiết</p>
+      <div class="branch-grid" id="pick-grid"></div>
+    </div>
+
+    <!-- VIEW: BRANCH DETAIL -->
+    <div class="view" id="view-branch-detail">
+      <div class="back-btn" id="back-btn" onclick="goBack()"><i class="ti ti-arrow-left" style="font-size:15px"></i>Quay lại</div>
+      <div class="branch-hero"><h2 id="d-name">—</h2><p id="d-sub">—</p></div>
+      <div class="alert-box" id="d-alert" style="display:none"><i class="ti ti-alert-triangle" style="font-size:15px"></i><span id="d-alert-txt"></span></div>
+      <div class="metrics" id="d-kpis"></div>
+      <div class="two-col">
+        <div class="card"><div class="card-hd"><i class="ti ti-trophy"></i>Top món bán chạy</div><div id="d-top"></div></div>
+        <div class="card"><div class="card-hd"><i class="ti ti-chart-line"></i>Doanh thu theo giờ</div><div class="chart-wrap"><canvas id="c-hourly" role="img" aria-label="Doanh thu theo giờ">Dữ liệu.</canvas></div></div>
       </div>
-      <div class="sc" style="margin-bottom:16px">
-        <div class="sch">👥 Phân loại NPS <span class="badge bb" id="segTot"></span></div>
-        <div style="padding:12px 18px">
-          <div class="seg-bar" id="segBar"></div>
-          <div class="seg-leg" id="segLeg"></div>
-        </div>
-      </div>
-      <div class="sc">
-        <div class="sch">🏪 Chi tiết từng cơ sở <span class="badge ba" id="wkLbl"></span></div>
-        <div class="br-grid" id="brGrid"></div>
-      </div>
-      <div class="ac-row">
-        <div class="sc" style="margin-bottom:0">
-          <div class="sch">🔔 Cảnh báo</div>
-          <div class="al" id="alList"></div>
-        </div>
-        <div class="sc" style="margin-bottom:0">
-          <div class="sch">💬 Nhận xét khách hàng</div>
-          <div class="cl" id="cmList"></div>
-        </div>
+      <div class="two-col">
+        <div class="card"><div class="card-hd"><i class="ti ti-file-invoice"></i>P&L cơ sở</div><div id="d-pl"></div></div>
+        <div class="card"><div class="card-hd"><i class="ti ti-box"></i>Tồn kho NVL</div><div id="d-stock"></div></div>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-var SID='17ld-H9xCP6YVEmlEH23g1O9xNy5aFptKv6gmj-ntFGA';
-var BR=['Stadium','Tây Sơn','LL Quân','Trần Vỹ','TQ Hoàn','Chiến Thắng'];
-var T={ct:80,ci:78,ctp:90,nt:30,ni:25,ntp:60,col:30};
-var RC=[],RN=[],SW=null,CC=null,NC=null;
+const USERS={
+  'rm.andrew':{pass:'oeg2024',role:'rm',name:'Andrew (RM)',branch:null},
+  'cht.tayson':{pass:'oeg2024',role:'cht',name:'CHT Tây Sơn',branch:'Tây Sơn'},
+  'cht.stadium':{pass:'oeg2024',role:'cht',name:'CHT Stadium',branch:'Stadium'},
+  'cht.llquan':{pass:'oeg2024',role:'cht',name:'CHT LL Quân',branch:'LL Quân'},
+  'cht.tranvy':{pass:'oeg2024',role:'cht',name:'CHT Trần Vỹ',branch:'Trần Vỹ'},
+  'cht.tqhoan':{pass:'oeg2024',role:'cht',name:'CHT TQ Hoàn',branch:'TQ Hoàn'},
+  'cht.chienthang':{pass:'oeg2024',role:'cht',name:'CHT Chiến Thắng',branch:'Chiến Thắng'},
+};
+const BRANCHES=['Stadium','Tây Sơn','LL Quân','Trần Vỹ','TQ Hoàn','Chiến Thắng'];
+const BCOLORS=['#1D9E75','#378ADD','#BA7517','#D85A30','#7F77DD','#D4537E'];
 
-setInterval(function(){var n=new Date();document.getElementById('clk').textContent=n.toLocaleTimeString('vi-VN',{hour12:false});},1000);
 
-async function csv(sheet){
-  var r=await fetch('https://docs.google.com/spreadsheets/d/'+SID+'/gviz/tq?tqx=out:csv&sheet='+encodeURIComponent(sheet));
-  var t=await r.text();
-  var L=t.trim().split('\n');if(L.length<2)return[];
-  var H=L[0].replace(/"/g,'').split(',').map(function(h){return h.trim();});
-  return L.slice(1).map(function(ln){
-    var v=[],c='',q=false;
-    for(var i=0;i<ln.length;i++){var ch=ln[i];if(ch==='"'){q=!q;continue;}if(ch===','&&!q){v.push(c.trim());c='';continue;}c+=ch;}
-    v.push(c.trim());
-    var o={};H.forEach(function(h,i){o[h]=(v[i]||'').trim();});return o;
-  }).filter(function(r){return Object.values(r).some(function(x){return x;});});
+<!-- ═══════════════════════════════════════════════════════════
+     API CONFIG — chỉnh 2 dòng này sau khi deploy Web App
+     ═══════════════════════════════════════════════════════════ -->
+<script>
+const FNB_API_URL = "PASTE_WEB_APP_URL_HERE";
+const FNB_TOKEN   = "oeg-fnb-key-2026";
+
+// Khi API chưa cấu hình (URL chưa thay), dùng mock để dashboard
+// vẫn chạy được. Sau khi paste URL thật vào trên → tắt flag này.
+const USE_MOCK = FNB_API_URL === "PASTE_WEB_APP_URL_HERE";
+
+// ─────────────────────────────────────────────
+// MOCK DATA (giữ nguyên để fallback)
+// ─────────────────────────────────────────────
+const _RAW={
+  'Stadium':    {revenue:5200000,orders:98, qty:156,costNvl:1560000,topItems:[{name:'Cà phê sữa đá',qty:42,revenue:1470000},{name:'Bạc xỉu đá',qty:38,revenue:1330000},{name:'Trà đào cam sả',qty:31,revenue:1395000},{name:'Matcha latte',qty:22,revenue:1210000},{name:'Nước ép cam',qty:23,revenue:805000}],stock:[{nvlName:'Cà phê Arabica',status:'Đủ'},{nvlName:'Sữa tươi',status:'Đủ'},{nvlName:'Đường trắng',status:'Sắp hết'}]},
+  'Tây Sơn':   {revenue:4200000,orders:82, qty:127,costNvl:1344000,topItems:[{name:'Bạc xỉu đá',qty:28,revenue:980000},{name:'Trà đào cam sả',qty:21,revenue:945000},{name:'Cà phê sữa đá',qty:18,revenue:630000},{name:'Matcha latte',qty:9,revenue:495000},{name:'Nước ép cam',qty:8,revenue:280000}],stock:[{nvlName:'Đường trắng',status:'Hết hàng'},{nvlName:'Trân châu',status:'Hết hàng'},{nvlName:'Sữa tươi',status:'Đủ'}]},
+  'LL Quân':   {revenue:3800000,orders:74, qty:112,costNvl:1140000,topItems:[{name:'Trà đào cam sả',qty:30,revenue:1350000},{name:'Cà phê sữa đá',qty:24,revenue:840000},{name:'Bạc xỉu đá',qty:22,revenue:770000},{name:'Matcha latte',qty:14,revenue:770000},{name:'Nước ép cam',qty:11,revenue:385000}],stock:[{nvlName:'Syrup caramel',status:'Sắp hết'},{nvlName:'Sữa tươi',status:'Đủ'},{nvlName:'Đường trắng',status:'Đủ'}]},
+  'Trần Vỹ':   {revenue:3100000,orders:59, qty:88, costNvl:930000, topItems:[{name:'Cà phê sữa đá',qty:22,revenue:770000},{name:'Bạc xỉu đá',qty:18,revenue:630000},{name:'Trà đào cam sả',qty:15,revenue:675000},{name:'Nước ép cam',qty:10,revenue:350000},{name:'Matcha latte',qty:8,revenue:440000}],stock:[{nvlName:'Cà phê Arabica',status:'Sắp hết'},{nvlName:'Trân châu',status:'Đủ'},{nvlName:'Sữa tươi',status:'Đủ'}]},
+  'TQ Hoàn':   {revenue:2900000,orders:55, qty:82, costNvl:870000, topItems:[{name:'Bạc xỉu đá',qty:20,revenue:700000},{name:'Trà đào cam sả',qty:16,revenue:720000},{name:'Cà phê sữa đá',qty:14,revenue:490000},{name:'Nước ép cam',qty:9,revenue:315000},{name:'Matcha latte',qty:7,revenue:385000}],stock:[{nvlName:'Matcha bột',status:'Hết hàng'},{nvlName:'Đường trắng',status:'Đủ'},{nvlName:'Sữa tươi',status:'Đủ'}]},
+  'Chiến Thắng':{revenue:2400000,orders:47,qty:71, costNvl:720000, topItems:[{name:'Cà phê sữa đá',qty:19,revenue:665000},{name:'Trà đào cam sả',qty:15,revenue:675000},{name:'Bạc xỉu đá',qty:12,revenue:420000},{name:'Nước ép cam',qty:9,revenue:315000},{name:'Matcha latte',qty:6,revenue:330000}],stock:[{nvlName:'Cà phê Arabica',status:'Đủ'},{nvlName:'Sữa tươi',status:'Sắp hết'},{nvlName:'Đường trắng',status:'Đủ'}]},
+};
+function _mockScale(f){
+  const o={totals:{revenue:0,orders:0,qty:0,costNvl:0,grossProfit:0},branches:[]};
+  BRANCHES.forEach(b=>{
+    const d=_RAW[b];
+    const rev=Math.round(d.revenue*f),cost=Math.round(d.costNvl*f);
+    const br={branch:b,revenue:rev,orders:Math.round(d.orders*f),qty:Math.round(d.qty*f),
+      costNvl:cost,grossProfit:rev-cost,
+      costPct:rev>0?Math.round(cost/rev*1000)/10:0,
+      marginPct:rev>0?Math.round((rev-cost)/rev*1000)/10:0,
+      topItems:d.topItems.map(i=>({name:i.name,qty:Math.round(i.qty*f),revenue:Math.round(i.revenue*f)})),
+      stock:d.stock,
+      hourly:['8h','9h','10h','11h','12h','13h','14h','15h','16h','17h','18h','19h','20h'].map((h,i)=>({hour:h,revenue:Math.max(0,Math.round(rev/13*(0.5+Math.sin(i*0.8+b.length)*0.35)))}))
+    };
+    o.branches.push(br);
+    o.totals.revenue+=rev;o.totals.orders+=br.orders;o.totals.qty+=br.qty;
+    o.totals.costNvl+=cost;o.totals.grossProfit+=br.grossProfit;
+  });
+  o.branches.sort((a,b)=>b.revenue-a.revenue);
+  o.totals.costPct=o.totals.revenue>0?Math.round(o.totals.costNvl/o.totals.revenue*1000)/10:0;
+  o.totals.marginPct=o.totals.revenue>0?Math.round(o.totals.grossProfit/o.totals.revenue*1000)/10:0;
+  return o;
 }
+const _MOCK={day:_mockScale(1),week:_mockScale(7),month:_mockScale(30)};
 
-async function loadData(){
-  document.getElementById('ldg').style.display='flex';
-  document.getElementById('dash').style.display='none';
-  try{
-    var res=await Promise.all([csv('RAW_CSAT'),csv('RAW_NPS')]);
-    RC=res[0];RN=res[1];
-    var wks=[...new Set([...RC.map(function(r){return r.Week;}), ...RN.map(function(r){return r.Week;})]).values()]
-      .filter(Boolean).sort(function(a,b){return parseInt(a)-parseInt(b);});
-    if(!SW||!wks.includes(SW))SW=wks[wks.length-1]||null;
-    bldWkBar(wks);render();
-    document.getElementById('ldg').style.display='none';
-    document.getElementById('dash').style.display='block';
-  }catch(e){document.getElementById('ldg').innerHTML='<div style="color:var(--red)">Lỗi: '+e.message+'</div>';}
-}
+// ─────────────────────────────────────────────
+// API LAYER — mock hoặc live
+// ─────────────────────────────────────────────
+const _cache = {};
 
-function bldWkBar(wks){
-  document.getElementById('weekBar').innerHTML=wks.map(function(w){
-    return '<button class="wbtn'+(w===SW?' active':'')+'" onclick="selW(\''+w+'\')">Tuần '+w+'</button>';
-  }).join('');
-}
-function selW(w){SW=w;loadData();}
+async function _apiFetch(action, params={}) {
+  const key = JSON.stringify({action, params});
+  const now = Date.now();
+  if (_cache[key] && now - _cache[key].ts < 5*60*1000) return _cache[key].data; // cache 5 phút
 
-function fw(rows,w,k){return rows.filter(function(r){return r[k||'Week']===String(w);});}
-function csat(rows){if(!rows.length)return null;return Math.round(rows.filter(function(r){return parseInt(r.score)>=4;}).length/rows.length*100);}
-function nps(rows){if(!rows.length)return null;var p=rows.filter(function(r){return parseInt(r.score_nps)>=9;}).length;var d=rows.filter(function(r){return parseInt(r.score_nps)<=6;}).length;return Math.round((p-d)/rows.length*100);}
-function cc(v){if(v===null)return 'var(--dim)';if(v>=T.ctp)return 'var(--neon)';if(v>=T.ct)return 'var(--green)';if(v>=70)return 'var(--amber)';return 'var(--red)';}
-function cn(v){if(v===null)return 'var(--dim)';if(v>=T.ntp)return 'var(--neon)';if(v>=T.nt)return 'var(--green)';if(v>=0)return 'var(--amber)';return 'var(--red)';}
-function st(cp,np){if(cp===null&&np===null)return 'new';if((cp===null||cp>=T.ct)&&(np===null||np>=T.nt))return 'ok';if(cp!==null&&cp<70)return 'bad';return 'warn';}
-
-function render(){
-  if(!SW)return;
-  var wc=fw(RC,SW),wn=fw(RN,SW);
-  var cp=csat(wc),np=nps(wn);
-  var mo=wc[0]&&wc[0].Month||wn[0]&&wn[0].Month||'';
-  document.getElementById('meta').textContent='Tuần '+SW+' · '+mo+' · '+wc.length+' CSAT · '+wn.length+' NPS';
-  document.getElementById('wkLbl').textContent='Tuần '+SW;
-  rKPI(wc,wn,cp,np); rBench(cp,np); rCharts(); rSeg(wn); rBr(wc,wn); rAlert(wc,wn,cp,np); rCom(wc,wn);
-}
-
-function rKPI(wc,wn,cp,np){
-  var pro=wn.filter(function(r){return parseInt(r.score_nps)>=9;}).length;
-  var pr=wn.length?Math.round(pro/wn.length*100):0;
-  var bad=BR.filter(function(b){var bc=wc.filter(function(r){return r['CƠ_SỞ']===b;});return bc.length&&(csat(bc)||0)<T.ct;}).length;
-  var D=function(ok,w){return ok?'dok':w?'dwarn':'dbad';};
-  var cards=[
-    {l:'CSAT%',v:cp!==null?cp+'%':'--',ac:cc(cp),p:cp||0,s:'Target ≥ '+T.ct+'%',d:D(cp>=T.ct,cp>=70)},
-    {l:'NPS',v:np!==null?String(np):'--',ac:cn(np),p:np!==null?Math.min(100,(np+100)/2):0,s:'Target ≥ '+T.nt,d:D(np>=T.nt,np>=0)},
-    {l:'Phiếu CSAT',v:wc.length,ac:'var(--blue)',p:Math.min(100,wc.length/(T.col*6)*100),s:'KPI ≥ '+(T.col*6)+'/tuần',d:D(wc.length>=T.col*6,wc.length>=T.col*3)},
-    {l:'Phiếu NPS',v:wn.length,ac:'var(--purple)',p:Math.min(100,wn.length/(T.col*6)*100),s:'KPI ≥ '+(T.col*6)+'/tuần',d:D(wn.length>=T.col*6,wn.length>=T.col*3)},
-    {l:'Promoter Rate',v:pr+'%',ac:'var(--neon)',p:pr,s:pro+'/'+wn.length+' Promoter',d:D(pr>=50,pr>=30)},
-    {l:'CS cần cải thiện',v:bad,ac:bad===0?'var(--green)':'var(--red)',p:Math.max(0,(6-bad)/6*100),s:'Dưới CSAT '+T.ct+'%',d:D(bad===0,bad<=2)},
-  ];
-  document.getElementById('kpiGrid').innerHTML=cards.map(function(c){
-    return '<div class="kc" style="--ac:'+c.ac+'"><div class="kdot '+c.d+'"></div><div class="kl">'+c.l+'</div><div class="kv" style="color:'+c.ac+'">'+c.v+'</div><div class="ks">'+c.s+'</div><div class="kb"><div class="kbf" style="width:'+c.p+'%;background:'+c.ac+'"></div></div></div>';
-  }).join('');
-}
-
-function rBench(cp,np){
-  document.getElementById('benchRow').innerHTML=
-    '<div class="bench-c"><div class="bct">📊 CSAT vs Benchmark ngành Gaming</div>'+
-    '<div class="bcr"><span class="bcl">OEG Tuần '+SW+'</span><span class="bcv" style="color:'+cc(cp||0)+'">'+( cp!==null?cp+'%':'--')+'</span></div>'+
-    '<div class="bcr"><span class="bcl">Target nội bộ</span><span class="bcv" style="color:var(--blue)">'+T.ct+'%</span></div>'+
-    '<div class="bcr"><span class="bcl">TB ngành Gaming</span><span class="bcv" style="color:var(--muted)">'+T.ci+'%</span></div>'+
-    '<div class="bcr"><span class="bcl">Top 25% ngành</span><span class="bcv" style="color:var(--amber)">'+T.ctp+'%</span></div></div>'+
-    '<div class="bench-c"><div class="bct">🎯 NPS vs Benchmark ngành Gaming</div>'+
-    '<div class="bcr"><span class="bcl">OEG Tuần '+SW+'</span><span class="bcv" style="color:'+cn(np||0)+'">'+( np!==null?np:'--')+'</span></div>'+
-    '<div class="bcr"><span class="bcl">Target nội bộ</span><span class="bcv" style="color:var(--blue)">'+T.nt+'</span></div>'+
-    '<div class="bcr"><span class="bcl">TB ngành Gaming</span><span class="bcv" style="color:var(--muted)">'+T.ni+'</span></div>'+
-    '<div class="bcr"><span class="bcl">Top 25% ngành</span><span class="bcv" style="color:var(--amber)">'+T.ntp+'</span></div></div>';
-}
-
-function rCharts(){
-  var allW=[...new Set([...RC.map(function(r){return r.Week;}), ...RN.map(function(r){return r.Week;})]).values()]
-    .filter(Boolean).sort(function(a,b){return parseInt(a)-parseInt(b);});
-  var lbls=allW.map(function(w){return 'T'+w;});
-  var cv=allW.map(function(w){var r=RC.filter(function(x){return x.Week===w;});return r.length?csat(r):null;});
-  var nv=allW.map(function(w){var r=RN.filter(function(x){return x.Week===w;});return r.length?nps(r):null;});
-  var lc=cv.filter(function(v){return v!==null;}); var ln=nv.filter(function(v){return v!==null;});
-  document.getElementById('csatLast').textContent=lc.length?lc[lc.length-1]+'%':'--';
-  document.getElementById('npsLast').textContent=ln.length?ln[ln.length-1]:'--';
-  var gc='rgba(255,255,255,0.04)',tc='#7D8590';
-  var base={responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:tc,font:{size:10},boxWidth:12}}},scales:{x:{ticks:{color:tc,font:{size:10}},grid:{color:gc}},y:{ticks:{color:tc,font:{size:10}},grid:{color:gc}}}};
-  if(CC)CC.destroy();
-  CC=new Chart(document.getElementById('csatC'),{type:'line',data:{labels:lbls,datasets:[
-    {label:'CSAT%',data:cv,borderColor:'#B4F400',backgroundColor:'rgba(180,244,0,0.07)',pointBackgroundColor:'#B4F400',pointRadius:5,tension:.35,fill:true,spanGaps:true},
-    {label:'Target '+T.ct+'%',data:allW.map(function(){return T.ct;}),borderColor:'rgba(59,139,245,.4)',borderDash:[5,4],pointRadius:0,borderWidth:1,fill:false},
-    {label:'Ngành '+T.ci+'%',data:allW.map(function(){return T.ci;}),borderColor:'rgba(255,255,255,.1)',borderDash:[3,5],pointRadius:0,borderWidth:1,fill:false},
-  ]},options:Object.assign({},base,{scales:Object.assign({},base.scales,{y:{ticks:{color:tc,font:{size:10},callback:function(v){return v+'%';}},grid:{color:gc},min:0,max:100}})})});
-  if(NC)NC.destroy();
-  NC=new Chart(document.getElementById('npsC'),{type:'line',data:{labels:lbls,datasets:[
-    {label:'NPS',data:nv,borderColor:'#3DD68C',backgroundColor:'rgba(61,214,140,0.07)',pointBackgroundColor:'#3DD68C',pointRadius:5,tension:.35,fill:true,spanGaps:true},
-    {label:'Target '+T.nt,data:allW.map(function(){return T.nt;}),borderColor:'rgba(59,139,245,.4)',borderDash:[5,4],pointRadius:0,borderWidth:1,fill:false},
-    {label:'Ngành '+T.ni,data:allW.map(function(){return T.ni;}),borderColor:'rgba(255,255,255,.1)',borderDash:[3,5],pointRadius:0,borderWidth:1,fill:false},
-  ]},options:Object.assign({},base,{scales:Object.assign({},base.scales,{y:{ticks:{color:tc,font:{size:10}},grid:{color:gc},min:-100,max:100}})})});
-}
-
-function rSeg(wn){
-  var n=wn.length;
-  var pro=wn.filter(function(r){return parseInt(r.score_nps)>=9;}).length;
-  var pas=wn.filter(function(r){var s=parseInt(r.score_nps);return s>=7&&s<=8;}).length;
-  var det=wn.filter(function(r){return parseInt(r.score_nps)<=6;}).length;
-  var pp=n?Math.round(pro/n*100):0,pp2=n?Math.round(pas/n*100):0,pd=n?Math.round(det/n*100):0;
-  document.getElementById('segTot').textContent=n+' phiếu NPS';
-  document.getElementById('segBar').innerHTML=n?
-    '<div class="s-pro" style="width:'+pp+'%"></div><div class="s-pas" style="width:'+pp2+'%"></div><div class="s-det" style="width:'+pd+'%"></div>':
-    '<div style="width:100%;background:var(--bg4);height:9px;border-radius:5px"></div>';
-  document.getElementById('segLeg').innerHTML=
-    '<div class="si"><div class="sd" style="background:var(--green)"></div>Promoter: '+pro+' ('+pp+'%)</div>'+
-    '<div class="si"><div class="sd" style="background:var(--amber)"></div>Passive: '+pas+' ('+pp2+'%)</div>'+
-    '<div class="si"><div class="sd" style="background:var(--red)"></div>Detractor: '+det+' ('+pd+'%)</div>';
-}
-
-function rBr(wc,wn){
-  var M={'ok':'bg','warn':'ba','bad':'br','new':'bb'};
-  var ML={'ok':'Đạt target','warn':'Cần theo dõi','bad':'Cần cải thiện','new':'Chưa có phiếu'};
-  document.getElementById('brGrid').innerHTML=BR.map(function(b){
-    var bc=wc.filter(function(r){return r['CƠ_SỞ']===b;}),bn=wn.filter(function(r){return r['CƠ_SỞ']===b;});
-    var cp=bc.length?csat(bc):null,np=bn.length?nps(bn):null;
-    var s=st(cp,np);
-    return '<div class="brc b'+s+'"><div class="brn">'+b+'<span class="badge '+M[s]+'" style="font-size:9px">'+ML[s]+'</span></div>'+
-      '<div class="bm-g">'+
-      '<div class="bm"><div class="bmv" style="color:'+cc(cp)+'">'+( cp!==null?cp+'%':'--')+'</div><div class="bml">CSAT%</div><div class="bmn">'+bc.length+' phiếu</div></div>'+
-      '<div class="bm"><div class="bmv" style="color:'+cn(np)+'">'+( np!==null?np:'--')+'</div><div class="bml">NPS</div><div class="bmn">'+bn.length+' phiếu</div></div>'+
-      '<div class="bm"><div class="bmv" style="color:var(--muted)">'+(bc.length+bn.length)+'</div><div class="bml">Tổng</div><div class="bmn">T'+SW+'</div></div>'+
-      '</div></div>';
-  }).join('');
-}
-
-function rAlert(wc,wn,cp,np){
-  var al=[];
-  if(!wc.length&&!wn.length){al.push({t:'awn',m:'Chưa có phiếu tuần '+SW+'. Tăng cường thu thập qua QR code.'});}
-  else{
-    if(cp!==null)al.push({t:cp>=T.ct?'aok':'awn',m:'CSAT chuỗi: '+cp+'% '+(cp>=T.ct?'✓ Đạt target':'→ Chưa đạt '+T.ct+'%')});
-    if(np!==null)al.push({t:np>=T.nt?'aok':'awn',m:'NPS chuỗi: '+np+' '+(np>=T.nt?'✓ Đạt target':'→ Chưa đạt '+T.nt)});
-    BR.forEach(function(b){
-      var bc=wc.filter(function(r){return r['CƠ_SỞ']===b;});
-      var cp2=bc.length?csat(bc):null;
-      if(cp2!==null&&cp2<70)al.push({t:'abd',m:b+': CSAT '+cp2+'% — Cần hành động ngay!'});
-      else if(cp2!==null&&cp2<T.ct)al.push({t:'awn',m:b+': CSAT '+cp2+'% — Chưa đạt '+T.ct+'%'});
-      if(bc.length>0&&bc.length<T.col)al.push({t:'awn',m:b+': '+bc.length+'/'+T.col+' phiếu CSAT — Cần thu thêm'});
-    });
+  if (USE_MOCK) {
+    const p = params.period || 'day';
+    if (action==='chain') return _MOCK[p];
+    if (action==='branch') {
+      const found = _MOCK[p].branches.find(b=>b.branch===params.branch);
+      return found || {};
+    }
+    return {};
   }
-  document.getElementById('alList').innerHTML=al.length?
-    al.slice(0,7).map(function(a){return '<div class="ai '+a.t+'">'+a.m+'</div>';}).join(''):
-    '<div class="emp">Không có cảnh báo</div>';
+
+  const qs = new URLSearchParams({action, token: FNB_TOKEN, ...params});
+  const res = await fetch(`${FNB_API_URL}?${qs}`, {redirect:'follow', cache:'no-store'});
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const json = await res.json();
+  if (!json.ok) throw new Error(json.error||'API error');
+  _cache[key] = {data: json.data, ts: now};
+  return json.data;
 }
 
-function rCom(wc,wn){
-  var items=[];
-  wc.filter(function(r){return r.comment;}).forEach(function(r){
-    items.push({t:parseInt(r.score)>=4?'pos':'neg',x:r.comment,m:r['CƠ_SỞ']+' · CSAT '+r.score+'/5 · '+r.Ngày});
-  });
-  wn.filter(function(r){return r.reason_negative;}).forEach(function(r){
-    items.push({t:'neg',x:r.reason_negative,m:r['CƠ_SỞ']+' · NPS '+r.score_nps+' · '+r.Ngày});
-  });
-  wn.filter(function(r){return r.reason_positive&&parseInt(r.score_nps)>=9;}).forEach(function(r){
-    items.push({t:'pos',x:r.reason_positive,m:r['CƠ_SỞ']+' · NPS '+r.score_nps+' · '+r.Ngày});
-  });
-  document.getElementById('cmList').innerHTML=items.length?
-    items.slice(0,6).map(function(c){
-      return '<div class="ci '+c.t+'"><div style="font-size:14px;flex-shrink:0">'+(c.t==='pos'?'👍':'⚠️')+'</div>'+
-        '<div><div class="ct">"'+c.x+'"</div><div class="cm">'+c.m+'</div></div></div>';
-    }).join(''):'<div class="emp">Chưa có nhận xét</div>';
+async function getChainData(p)  { return _apiFetch('chain',  {period:p}); }
+async function getBranchData(b, p) {
+  const chain = await getChainData(p);
+  const found = (chain.branches||[]).find(br=>br.branch===b) || {};
+  // Khi live: stock và hourly cần call riêng vì refreshFnbData() không lưu chúng vào FNB_DATA
+  if (!USE_MOCK) {
+    try { const s = await _apiFetch('stock', {branch:b}); found.stock = s.items||[]; } catch(e){}
+    try { const h = await _apiFetch('hourly',{branch:b});  found.hourly= h.hours||[]; } catch(e){}
+    try { const t = await _apiFetch('topitems',{period:p,branch:b}); found.topItems=t.items||[]; } catch(e){}
+  }
+  return found;
 }
 
-loadData();
+// ─────────────────────────────────────────────
+// LOADING / ERROR HELPERS
+// ─────────────────────────────────────────────
+function _loading(id) {
+  const el=document.getElementById(id); if(!el)return;
+  el.innerHTML=`<div style="display:flex;align-items:center;gap:8px;padding:16px;color:var(--muted);font-size:13px">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+    Đang tải...</div>`;
+}
+function _error(id, msg) {
+  const el=document.getElementById(id); if(!el)return;
+  el.innerHTML=`<div style="padding:12px;background:var(--danger-bg);border-radius:8px;color:var(--danger-text);font-size:12px">Lỗi: ${msg}</div>`;
+}
+const _spin = document.createElement('style');
+_spin.textContent='@keyframes spin{to{transform:rotate(360deg)}}';
+document.head.appendChild(_spin);
+
+// ─────────────────────────────────────────────
+// STATUS BADGE: "● Live data" vs "● Mock data"
+// ─────────────────────────────────────────────
+function _injectStatusBadge() {
+  const bar = document.querySelector('.topbar .tb-right');
+  if (!bar) return;
+  const badge = document.createElement('div');
+  badge.id = 'data-status';
+  badge.style.cssText='display:flex;align-items:center;gap:4px;font-size:11px;padding:4px 8px;border-radius:20px;border:1px solid var(--border);color:var(--muted)';
+  badge.innerHTML = USE_MOCK
+    ? '<span style="width:7px;height:7px;border-radius:50%;background:#BA7517;display:inline-block"></span>Demo data'
+    : '<span style="width:7px;height:7px;border-radius:50%;background:#1D9E75;display:inline-block"></span>Live data';
+  bar.insertBefore(badge, bar.firstChild);
+}
+
+// ─────────────────────────────────────────────
+// USERS & APP STATE
+// ─────────────────────────────────────────────
+const USERS={
+  'rm.andrew':    {pass:'oeg2024',role:'rm', name:'Andrew (RM)',    branch:null},
+  'cht.tayson':   {pass:'oeg2024',role:'cht',name:'CHT Tây Sơn',    branch:'Tây Sơn'},
+  'cht.stadium':  {pass:'oeg2024',role:'cht',name:'CHT Stadium',    branch:'Stadium'},
+  'cht.llquan':   {pass:'oeg2024',role:'cht',name:'CHT LL Quân',    branch:'LL Quân'},
+  'cht.tranvy':   {pass:'oeg2024',role:'cht',name:'CHT Trần Vỹ',    branch:'Trần Vỹ'},
+  'cht.tqhoan':   {pass:'oeg2024',role:'cht',name:'CHT TQ Hoàn',    branch:'TQ Hoàn'},
+  'cht.chienthang':{pass:'oeg2024',role:'cht',name:'CHT Chiến Thắng',branch:'Chiến Thắng'},
+};
+const BRANCHES=['Stadium','Tây Sơn','LL Quân','Trần Vỹ','TQ Hoàn','Chiến Thắng'];
+const BCOLORS=['#1D9E75','#378ADD','#BA7517','#D85A30','#7F77DD','#D4537E'];
+
+const fmt=n=>new Intl.NumberFormat('vi-VN').format(Math.round(n));
+const fmtM=n=>(n/1000000).toFixed(1)+'M';
+
+let session=null,period='day',curView='chain',curBranch=null;
+let cRev=null,cMargin=null,cHourly=null;
+let _refreshTimer=null;
+
+// ─────────────────────────────────────────────
+// AUTH
+// ─────────────────────────────────────────────
+function doLogin(){
+  const u=document.getElementById('u').value.trim().toLowerCase();
+  const p=document.getElementById('p').value;
+  if(USERS[u]&&USERS[u].pass===p){
+    session={...USERS[u],username:u};
+    document.getElementById('err').style.display='none';
+    document.getElementById('login-page').style.display='none';
+    const app=document.getElementById('app');
+    app.style.display='flex';app.style.flexDirection='column';
+    document.getElementById('user-label').textContent=session.name;
+    _injectStatusBadge();
+    if(session.role==='rm'){
+      document.getElementById('nav-bar').style.display='flex';
+      document.getElementById('tb-sub').textContent='Regional Manager · Toàn chuỗi';
+      showView('chain',document.querySelector('.nav-btn.active'));
+    } else {
+      document.getElementById('nav-bar').style.display='none';
+      document.getElementById('tb-sub').textContent=session.branch;
+      openDetail(session.branch);
+      document.getElementById('back-btn').style.display='none';
+    }
+    // Auto-refresh mỗi 15 phút
+    _refreshTimer=setInterval(()=>{
+      if(curView==='chain') renderChain();
+      else if(curView==='branch-detail'&&curBranch) renderDetail(curBranch);
+    }, 15*60*1000);
+  } else {
+    document.getElementById('err').style.display='block';
+  }
+}
+document.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+
+function doLogout(){
+  session=null;
+  if(_refreshTimer){clearInterval(_refreshTimer);_refreshTimer=null;}
+  Object.keys(_cache).forEach(k=>delete _cache[k]);
+  document.getElementById('app').style.display='none';
+  document.getElementById('login-page').style.display='flex';
+  document.getElementById('u').value='';
+  document.getElementById('p').value='';
+  [cRev,cMargin,cHourly].forEach(c=>{if(c)c.destroy();});
+  cRev=cMargin=cHourly=null;
+}
+
+// ─────────────────────────────────────────────
+// NAVIGATION
+// ─────────────────────────────────────────────
+function showView(v,btn){
+  curView=v;
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  if(v==='chain'){document.getElementById('view-chain').classList.add('active');renderChain();}
+  else if(v==='branch-pick'){document.getElementById('view-branch-pick').classList.add('active');renderPick();}
+  else if(v==='branch-detail'){document.getElementById('view-branch-detail').classList.add('active');}
+}
+
+function setPeriod(p,btn){
+  period=p;
+  Object.keys(_cache).forEach(k=>delete _cache[k]); // flush cache khi đổi period
+  document.querySelectorAll('.pb').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if(curView==='chain') renderChain();
+  else if(curView==='branch-pick') renderPick();
+  else if(curView==='branch-detail'&&curBranch) renderDetail(curBranch);
+  else if(session?.role==='cht') renderDetail(session.branch);
+}
+
+function openDetail(b){
+  curBranch=b;curView='branch-detail';
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.getElementById('view-branch-detail').classList.add('active');
+  if(session&&session.role==='rm') document.getElementById('back-btn').style.display='flex';
+  renderDetail(b);
+}
+
+function goBack(){
+  curView='branch-pick';
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.getElementById('view-branch-pick').classList.add('active');
+  document.getElementById('back-btn').style.display='none';
+  document.querySelectorAll('.nav-btn').forEach((b,i)=>b.classList.toggle('active',i===1));
+  renderPick();
+}
+
+// ─────────────────────────────────────────────
+// RENDER: CHAIN
+// ─────────────────────────────────────────────
+async function renderChain(){
+  _loading('chain-kpis');
+  _loading('ranking-grid');
+  try {
+    const {totals,branches} = await getChainData(period);
+    const t=totals;
+
+    document.getElementById('chain-kpis').innerHTML=`
+      <div class="metric"><div class="ml">Doanh thu chuỗi</div><div class="mv">${fmtM(t.revenue)}</div><div class="ms">VND · ${period==='day'?'hôm nay':period==='week'?'tuần này':'tháng này'}</div></div>
+      <div class="metric"><div class="ml">Tổng đơn</div><div class="mv">${fmt(t.orders)}</div><div class="ms">orders · 6 cơ sở</div></div>
+      <div class="metric"><div class="ml">Tổng lượng bán</div><div class="mv">${fmt(t.qty)}</div><div class="ms">ly / món</div></div>
+      <div class="metric"><div class="ml">Avg gross margin</div><div class="mv">${t.marginPct.toFixed(1)}%</div><div class="ms md ${t.marginPct>=60?'up':'dn'}">${t.marginPct>=60?'Tốt':'Cần cải thiện'}</div></div>
+      <div class="metric"><div class="ml">Cost NVL chuỗi</div><div class="mv">${fmtM(t.costNvl)}</div><div class="ms">${t.costPct.toFixed(1)}% doanh thu</div></div>`;
+
+    const maxRev=branches[0]?.revenue||1;
+    document.getElementById('ranking-grid').innerHTML=branches.map((b,i)=>{
+      const pct=Math.round(b.revenue/maxRev*100);
+      const rc=i===0?'r1':i===1?'r2':i===2?'r3':'rn';
+      return `<div class="bc${i===0?' top1':''}" onclick="openDetail('${b.branch}')">
+        <div class="bc-head"><span class="bc-name">${b.branch}</span><span class="rank-badge ${rc}">#${i+1}</span></div>
+        <div class="bc-rev">${fmtM(b.revenue)}</div>
+        <div class="bc-sub">${fmt(b.orders)} đơn · ${b.marginPct.toFixed(1)}% margin</div>
+        <div class="bc-bar"><div class="bc-fill" style="width:${pct}%"></div></div>
+      </div>`;
+    }).join('');
+
+    document.getElementById('compare-tb').innerHTML=branches.map(b=>{
+      const pc=b.marginPct>=65?'pg':b.marginPct>=50?'py':'pr';
+      const lbl=b.marginPct>=65?'Tốt':b.marginPct>=50?'Đạt':'Thấp';
+      return `<tr><td style="font-weight:600">${b.branch}</td><td>${fmtM(b.revenue)}</td><td>${b.costPct.toFixed(1)}%</td><td>${b.marginPct.toFixed(1)}%</td><td><span class="pill ${pc}">${lbl}</span></td></tr>`;
+    }).join('');
+
+    // Top items — aggregate từ branches
+    const itemMap={};
+    branches.forEach(b=>(b.topItems||[]).forEach(i=>{
+      itemMap[i.name]=itemMap[i.name]||{name:i.name,qty:0,revenue:0};
+      itemMap[i.name].qty+=i.qty; itemMap[i.name].revenue+=i.revenue;
+    }));
+    const tops=Object.values(itemMap).sort((a,b)=>b.qty-a.qty).slice(0,5);
+    const maxQ=tops[0]?.qty||1;
+    document.getElementById('chain-top').innerHTML=tops.map((t,i)=>`
+      <div class="tr"><span class="tr-rank">#${i+1}</span><span class="tr-name">${t.name}</span>
+      <div class="tr-bar"><div class="tr-fill" style="width:${Math.round(t.qty/maxQ*100)}%"></div></div>
+      <span class="tr-qty">${fmt(t.qty)}</span><span class="tr-rev">${fmtM(t.revenue)}</span></div>`).join('');
+
+    // Charts
+    if(cRev)cRev.destroy(); if(cMargin)cMargin.destroy();
+    const labels=branches.map(b=>b.branch);
+    const revs=branches.map(b=>Math.round(b.revenue/100000)/10);
+    const margins=branches.map(b=>b.marginPct);
+    const cols=branches.map(b=>BCOLORS[BRANCHES.indexOf(b.branch)]);
+
+    cRev=new Chart(document.getElementById('c-rev'),{type:'bar',data:{labels,datasets:[{label:'Doanh thu (M)',data:revs,backgroundColor:cols.map(c=>c+'BB'),borderColor:cols,borderWidth:1.5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:10}},grid:{display:false}},y:{ticks:{font:{size:10},callback:v=>v+'M'},grid:{color:'rgba(128,128,128,0.08)'}}}}});
+    cMargin=new Chart(document.getElementById('c-margin'),{type:'bar',data:{labels,datasets:[{label:'Margin %',data:margins,backgroundColor:margins.map(m=>m>=65?'#1D9E75BB':m>=50?'#BA7517BB':'#A32D2DBB'),borderColor:margins.map(m=>m>=65?'#1D9E75':m>=50?'#BA7517':'#A32D2D'),borderWidth:1.5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:10}},grid:{display:false}},y:{min:0,max:100,ticks:{font:{size:10},callback:v=>v+'%'},grid:{color:'rgba(128,128,128,0.08)'}}}}});
+
+  } catch(e) {
+    _error('chain-kpis', e.message);
+    _error('ranking-grid', e.message);
+    console.error('renderChain:', e);
+  }
+}
+
+// ─────────────────────────────────────────────
+// RENDER: BRANCH PICK
+// ─────────────────────────────────────────────
+async function renderPick(){
+  _loading('pick-grid');
+  try {
+    const {branches} = await getChainData(period);
+    const maxRev=branches[0]?.revenue||1;
+    document.getElementById('pick-grid').innerHTML=branches.map((b,i)=>{
+      const pct=Math.round(b.revenue/maxRev*100);
+      const rc=i===0?'r1':i===1?'r2':i===2?'r3':'rn';
+      return `<div class="bc${i===0?' top1':''}" onclick="openDetail('${b.branch}')">
+        <div class="bc-head"><span class="bc-name">${b.branch}</span><span class="rank-badge ${rc}">#${i+1}</span></div>
+        <div class="bc-rev">${fmtM(b.revenue)}</div>
+        <div class="bc-sub">${fmt(b.orders)} đơn · ${b.marginPct.toFixed(1)}% margin</div>
+        <div class="bc-bar"><div class="bc-fill" style="width:${pct}%"></div></div>
+      </div>`;
+    }).join('');
+  } catch(e) { _error('pick-grid', e.message); }
+}
+
+// ─────────────────────────────────────────────
+// RENDER: BRANCH DETAIL
+// ─────────────────────────────────────────────
+async function renderDetail(branch){
+  _loading('d-kpis');
+  _loading('d-top');
+  _loading('d-pl');
+  _loading('d-stock');
+  try {
+    const d = await getBranchData(branch, period);
+    document.getElementById('d-name').textContent=branch;
+    document.getElementById('d-sub').textContent=`Cơ sở ${branch} · ${period==='day'?'hôm nay':period==='week'?'tuần này':'tháng này'}`;
+
+    // Alert NVL
+    const low=(d.stock||[]).filter(s=>s.status&&s.status!=='Đủ');
+    const al=document.getElementById('d-alert');
+    if(low.length){al.style.display='flex';document.getElementById('d-alert-txt').textContent=`${low.length} NVL cần chú ý: ${low.map(s=>s.nvlName||s.name).join(', ')}`;}
+    else al.style.display='none';
+
+    // KPIs
+    const margin=d.marginPct||0, costP=d.costPct||0;
+    document.getElementById('d-kpis').innerHTML=`
+      <div class="metric"><div class="ml">Doanh thu</div><div class="mv">${fmtM(d.revenue||0)}</div><div class="ms">VND</div></div>
+      <div class="metric"><div class="ml">Số đơn</div><div class="mv">${fmt(d.orders||0)}</div><div class="ms">orders</div></div>
+      <div class="metric"><div class="ml">Lượng bán</div><div class="mv">${fmt(d.qty||0)}</div><div class="ms">ly/món</div></div>
+      <div class="metric"><div class="ml">Gross margin</div><div class="mv">${margin.toFixed(1)}%</div><div class="ms md ${margin>=65?'up':margin>=50?'':'dn'}">${margin>=65?'Tốt':margin>=50?'Đạt':'Cần cải thiện'}</div></div>`;
+
+    // Top items
+    const items=d.topItems||[];
+    const maxQ=items[0]?.qty||1;
+    document.getElementById('d-top').innerHTML=items.length
+      ? items.map((t,i)=>`<div class="tr"><span class="tr-rank">#${i+1}</span><span class="tr-name">${t.name}</span>
+          <div class="tr-bar"><div class="tr-fill" style="width:${Math.round(t.qty/maxQ*100)}%"></div></div>
+          <span class="tr-qty">${fmt(t.qty)}</span><span class="tr-rev">${fmtM(t.revenue)}</span></div>`).join('')
+      : '<div style="padding:12px;font-size:12px;color:var(--muted)">Chưa có dữ liệu</div>';
+
+    // P&L
+    const gross=d.grossProfit||0;
+    document.getElementById('d-pl').innerHTML=`
+      <div class="pl-row"><span style="color:var(--muted)">Doanh thu</span><span>${fmt(d.revenue||0)} đ</span></div>
+      <div class="pl-row"><span style="color:var(--muted)">— Cost NVL</span><span style="color:#A32D2D">- ${fmt(d.costNvl||0)} đ</span></div>
+      <div class="pl-row total"><span>Gross Profit</span><span style="color:#1D9E75">${fmt(gross)} đ</span></div>
+      <div style="height:5px;background:var(--bg);border-radius:3px;margin-top:10px;overflow:hidden"><div style="height:100%;border-radius:3px;background:#1D9E75;width:${Math.min(margin,100).toFixed(0)}%"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:6px"><span>Cost ${costP.toFixed(1)}%</span><span>Margin ${margin.toFixed(1)}%</span></div>`;
+
+    // Stock
+    const stock=d.stock||[];
+    document.getElementById('d-stock').innerHTML=stock.length
+      ? stock.map(s=>{
+          const st=s.status||'Đủ';
+          const ok=st==='Đủ',warn=st==='Sắp hết';
+          return `<div class="stock-row">
+            <i class="ti ti-${ok?'circle-check':warn?'alert-circle':'circle-x'}" style="font-size:16px;color:${ok?'#1D9E75':warn?'#BA7517':'#A32D2D'}"></i>
+            <span style="flex:1">${s.nvlName||s.name||'—'}</span>
+            <span class="pill ${ok?'pg':warn?'py':'pr'}">${st}</span>
+          </div>`;}).join('')
+      : '<div style="padding:12px;font-size:12px;color:var(--muted)">Chưa có dữ liệu kiểm kho</div>';
+
+    // Hourly chart
+    if(cHourly)cHourly.destroy();
+    const hours=(d.hourly||[]);
+    if(hours.length){
+      cHourly=new Chart(document.getElementById('c-hourly'),{type:'line',data:{labels:hours.map(h=>h.hour),datasets:[{label:'Doanh thu',data:hours.map(h=>h.revenue),borderColor:'#1D9E75',backgroundColor:'rgba(29,158,117,0.07)',borderWidth:2,pointRadius:2,tension:0.4,fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:10},maxRotation:0},grid:{display:false}},y:{ticks:{font:{size:10},callback:v=>Math.round(v/1000)+'k'},grid:{color:'rgba(128,128,128,0.08)'}}}}});
+    }
+
+  } catch(e) {
+    _error('d-kpis', e.message);
+    console.error('renderDetail:', e);
+  }
+}
 </script>
 </body>
 </html>
